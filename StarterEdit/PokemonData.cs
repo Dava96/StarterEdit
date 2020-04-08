@@ -12,6 +12,7 @@ namespace StarterEdit
         private int[] pokemonDecimals;
         private string[] pokemonHexValues;
         private string[] pokemonNames;
+        private string[] pokedexOrderedNames;
         private StreamReader readNames;
 
         
@@ -22,10 +23,17 @@ namespace StarterEdit
             pokemonDecimals = new int[256];
             pokemonHexValues = new string[256];
             pokemonNames = new string[256];
+            pokedexOrderedNames = new string[153];
 
             populateArray(pokemonDecimals);
             populateArray(pokemonNames, readNames);
             populateArray(pokemonHexValues, pokemonDecimals);
+            readNames = new StreamReader(setDirectory() + @".\PokemonNamesPokedexOrder.txt");
+
+            populateArray(pokedexOrderedNames, readNames);
+            //Console.WriteLine(pokedexOrderedNames[153]); // this is in preperation of pokemon stat editing capabilites as pokemon names are stored in dex order there
+
+
         }
 
         public int[] populateArray(int[] pokemonDecimals)

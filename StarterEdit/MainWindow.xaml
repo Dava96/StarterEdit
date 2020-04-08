@@ -1,14 +1,13 @@
 ﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StarterEdit"
         xmlns:Collections="clr-namespace:System.Collections;assembly=System.Runtime.Extensions" x:Class="StarterEdit.MainWindow"
         mc:Ignorable="d"
-        Title="Starter Edit" Height="152" Width="589" ResizeMode="NoResize">
-    <Grid Margin="0,0,0,-16" HorizontalAlignment="Center" Width="588">
+        Title="Starter Edit" Height="202" Width="589" ResizeMode="NoResize">
+    <Grid Margin="0,0,0,-43" HorizontalAlignment="Center" Width="588">
         <Grid HorizontalAlignment="Center" Height="59" VerticalAlignment="Top" Width="530" Margin="0,29,0,0">
             <Label x:Name="Starter1" Content="Squirtle" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Starter One"/>
             <Label x:Name="Starter2" Content="Bulbasaur" HorizontalAlignment="Left" Margin="206,0,0,0" VerticalAlignment="Top" ToolTip="Starter Two"/>
@@ -38,5 +37,20 @@
                 </MenuItem>
             </Menu>
         </Grid>
+        <TextBox x:Name="LevelBox" HorizontalAlignment="Left" Margin="29,115,0,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" ToolTip="Sets Pokemon level">
+            <TextBox.DataContext>
+                <local:Offsets/>
+            </TextBox.DataContext>
+        </TextBox>
+        <TextBox x:Name="LevelBox2" HorizontalAlignment="Center" Margin="0,115,0,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" ToolTip="Sets Pokemon level">
+            <TextBox.DataContext>
+                <local:Offsets/>
+            </TextBox.DataContext>
+        </TextBox>
+        <TextBox x:Name="LevelBox3" HorizontalAlignment="Left" Margin="418,115,0,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" ToolTip="Sets Pokemon level">
+            <TextBox.DataContext>
+                <local:Offsets/>
+            </TextBox.DataContext>
+        </TextBox>
     </Grid>
 </Window>

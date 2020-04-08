@@ -38,10 +38,14 @@ namespace StarterEdit
             NameList2.ItemsSource = pokemonData.getPokemonNames();
             NameList3.ItemsSource = pokemonData.getPokemonNames();
 
+
+
+
             pkmNames = pokemonData.getPokemonNames();
             bulbOffsets = offsets.getBulbasuarOffsets();
             charmOffsets = offsets.getCharmanderOffsets();
             sqrtlOffsets = offsets.getSquirtleOffsets();
+            //offsets.FirstBattleOffsets;
            
         }
 
@@ -54,6 +58,8 @@ namespace StarterEdit
             readStarterPokemon(sqrtlOffsets, reader, Starter1, NameList, 0);
             readStarterPokemon(bulbOffsets, reader, Starter2, NameList2, 1);
             readStarterPokemon(charmOffsets, reader, Starter3, NameList3, 2);
+
+            readRivalBattles(offsets.FirstBattleLevels, reader, LevelBox, LevelBox2, LevelBox3);
             reader.Close();
         }
 
@@ -93,6 +99,35 @@ namespace StarterEdit
                     writer.Flush();
                 }
             }
+        }
+
+        public void readRivalBattles(long[] offsetArray, BinaryReader reader, TextBox levelBox, TextBox levelBox2, TextBox levelBox3) // probably a better way of doing this
+        {
+            int pokemonLevel = 0;
+            for (int i = 0; i < offsetArray.Length; i++)
+            {
+                reader.BaseStream.Position = offsetArray[i];
+                string hexVal = string.Format("{0:X}", reader.ReadByte());
+                pokemonLevel = Convert.ToInt32(hexVal, 16);
+
+                if (i == 0)
+                {
+                    levelBox.Text = pokemonLevel.ToString();
+                } 
+                else if (i == 1)
+                {
+                    levelBox2.Text = pokemonLevel.ToString();
+                }
+                else
+                {
+                    levelBox3.Text = pokemonLevel.ToString();
+                }
+            }
+        }
+
+        public void writeRivalBattles(long[] offsetArray, StreamWriter writer, int pokemonValue, int starterNumber, TextBox levelBox)
+        {
+
         }
     }
 }
