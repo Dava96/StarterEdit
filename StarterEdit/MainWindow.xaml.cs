@@ -59,7 +59,7 @@ namespace StarterEdit
             readStarterPokemon(bulbOffsets, reader, Starter2, NameList2, 1);
             readStarterPokemon(charmOffsets, reader, Starter3, NameList3, 2);
 
-            readRivalBattles(offsets.FirstBattleLevels, reader, LevelBox, LevelBox2, LevelBox3);
+            readBattleLvls(offsets.FirstBattleLevels, reader, LevelBox, LevelBox2, LevelBox3);
             reader.Close();
         }
 
@@ -83,6 +83,10 @@ namespace StarterEdit
             writeStarterPokemon(sqrtlOffsets, writer, NameList.SelectedIndex, 0);
             writeStarterPokemon(bulbOffsets, writer, NameList2.SelectedIndex, 1);
             writeStarterPokemon(charmOffsets, writer, NameList3.SelectedIndex, 2);
+
+            writeBattleLvls(offsets.FirstBattleLevels, writer, LevelBox, LevelBox2, LevelBox3);
+            writeBattlePkm(offsets.FirstBattlePokemon, writer, NameList.SelectedIndex, NameList2.SelectedIndex, NameList3.SelectedIndex);
+
             MessageBox.Show("Changes saved succesfully", "Changes saved");
             writer.Close();
 
@@ -101,7 +105,18 @@ namespace StarterEdit
             }
         }
 
-        public void readRivalBattles(long[] offsetArray, BinaryReader reader, TextBox levelBox, TextBox levelBox2, TextBox levelBox3) // probably a better way of doing this
+        public void writeBattlePkm(long[] offsetArray, StreamWriter writer, int pkm1, int pkm2, int pkm3) // Pokemon 1,2 and 3 values from nameList
+        {
+            int[] pokemonArray = new int[] { pkm1, pkm2, pkm3 }; // the game might default to bulbasurs position if this is changed
+            for (int i = 0; i < offsetArray.Length; i++)
+            {
+                writer.BaseStream.Position = offsetArray[i];
+                writer.BaseStream.WriteByte((byte)pokemonArray[i]);
+                writer.Flush();
+            }
+        }
+
+        public void readBattleLvls(long[] offsetArray, BinaryReader reader, TextBox levelBox, TextBox levelBox2, TextBox levelBox3) // probably a better way of doing this
         {
             int pokemonLevel = 0;
             for (int i = 0; i < offsetArray.Length; i++)
@@ -125,9 +140,29 @@ namespace StarterEdit
             }
         }
 
-        public void writeRivalBattles(long[] offsetArray, StreamWriter writer, int pokemonValue, int starterNumber, TextBox levelBox)
+        public void writeBattleLvls(long[] offsetArray, StreamWriter writer, TextBox levelBox, TextBox levelBox2, TextBox levelBox3)
         {
+            for (int i = 0; i < offsetArray.Length; i++)
+            {
+                writer.BaseStream.Position = offsetArray[i];
 
+                if (i == 0)
+                {
+                    writer.BaseStream.WriteByte((byte) Int32.Parse(levelBox.Text.ToString()));
+                    writer.Flush();
+                }
+                else if (i == 1)
+                { 
+                    writer.BaseStream.WriteByte((byte)Int32.Parse(levelBox2.Text.ToString()));
+                    writer.Flush();
+                }
+                else
+                {
+                    writer.BaseStream.WriteByte((byte)Int32.Parse(levelBox3.Text.ToString()));
+                    writer.Flush();
+                }
+            }
         }
     }
+        
 }
