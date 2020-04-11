@@ -116,51 +116,28 @@ namespace StarterEdit
             }
         }
 
-        public void readBattleLvls(long[] offsetArray, BinaryReader reader, TextBox levelBox, TextBox levelBox2, TextBox levelBox3) // probably a better way of doing this
+        public void readBattleLvls(long[] offsetArray, BinaryReader reader, TextBox levelBox, TextBox levelBox2, TextBox levelBox3)
         {
+            TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
             int pokemonLevel = 0;
             for (int i = 0; i < offsetArray.Length; i++)
             {
                 reader.BaseStream.Position = offsetArray[i];
                 string hexVal = string.Format("{0:X}", reader.ReadByte());
                 pokemonLevel = Convert.ToInt32(hexVal, 16);
-
-                if (i == 0)
-                {
-                    levelBox.Text = pokemonLevel.ToString();
-                } 
-                else if (i == 1)
-                {
-                    levelBox2.Text = pokemonLevel.ToString();
-                }
-                else
-                {
-                    levelBox3.Text = pokemonLevel.ToString();
-                }
+                levelBoxes[i].Text = pokemonLevel.ToString();
             }
         }
 
         public void writeBattleLvls(long[] offsetArray, StreamWriter writer, TextBox levelBox, TextBox levelBox2, TextBox levelBox3)
         {
+            TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
             for (int i = 0; i < offsetArray.Length; i++)
             {
                 writer.BaseStream.Position = offsetArray[i];
 
-                if (i == 0)
-                {
-                    writer.BaseStream.WriteByte((byte) Int32.Parse(levelBox.Text.ToString()));
-                    writer.Flush();
-                }
-                else if (i == 1)
-                { 
-                    writer.BaseStream.WriteByte((byte)Int32.Parse(levelBox2.Text.ToString()));
-                    writer.Flush();
-                }
-                else
-                {
-                    writer.BaseStream.WriteByte((byte)Int32.Parse(levelBox3.Text.ToString()));
-                    writer.Flush();
-                }
+                writer.BaseStream.WriteByte((byte)Int32.Parse(levelBoxes[i].Text.ToString()));
+                writer.Flush();
             }
         }
     }
