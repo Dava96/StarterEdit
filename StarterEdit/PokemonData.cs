@@ -9,10 +9,10 @@ namespace StarterEdit
     class PokemonData
     {
 
-        private int[] pokemonDecimals;
-        private string[] pokemonHexValues;
-        private string[] pokemonNames;
-        private string[] pokedexOrderedNames;
+        public int[] pokemonDecimals;
+        public string[] pokemonHexValues;
+        public string[] pokemonNames;
+        public string[] pokedexOrderedNames;
         private StreamReader readNames;
 
         
