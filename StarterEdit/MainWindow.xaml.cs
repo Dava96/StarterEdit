@@ -23,10 +23,10 @@ namespace StarterEdit
         PokemonData pokemonData = new PokemonData();
         Offsets offsets = new Offsets();
         static OpenFileDialog openDialog = new OpenFileDialog();
-        static string[] pkmNames;
-        static long[] sqrtlOffsets;
-        static long[] bulbOffsets;
-        static long[] charmOffsets;
+        string[] pkmNames;
+        long[] sqrtlOffsets;
+        long[] bulbOffsets;
+        long[] charmOffsets;
         byte[] currentPokmon = new byte[3];
 
 
