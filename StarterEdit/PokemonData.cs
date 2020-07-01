@@ -15,7 +15,9 @@ namespace StarterEdit
         public string[] pokedexOrderedNames;
         private StreamReader readNames;
 
-        
+        // to do make a seperate window for the trainer editor
+        // to do make a stat editor for each individual pokemon
+        // to do implement the title screen editor
         public PokemonData()
         {
             readNames = new StreamReader(setDirectory() + @".\PokemonNames.txt");

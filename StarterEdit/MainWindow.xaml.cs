@@ -14,11 +14,13 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
+using System.Text.RegularExpressions;
 
 namespace StarterEdit
 {
     public partial class MainWindow : Window
     {
+        public readonly Regex numbersOnly = new Regex("[^0-9.-]+"); // Used force text input on the text boxes
         Dictionary<int, string> pokemonNames = new Dictionary<int, string>();
         PokemonData pokemonData = new PokemonData();
         Offsets offsets = new Offsets();
@@ -39,8 +41,7 @@ namespace StarterEdit
             NameList3.ItemsSource = pokemonData.getPokemonNames();
 
 
-
-
+           
             pkmNames = pokemonData.getPokemonNames();
             bulbOffsets = offsets.getBulbasuarOffsets();
             charmOffsets = offsets.getCharmanderOffsets();
@@ -51,7 +52,7 @@ namespace StarterEdit
 
         private void menuOpen_Click(object sender, RoutedEventArgs e)
         {
-            openDialog.Filter = "PKM R/B (*.gb)|*.gb|All files (*.*)|*.*";
+            openDialog.Filter = "PKM R/B (*.gb)|*.gb";
             openDialog.ShowDialog();
             BinaryReader reader = new BinaryReader(File.OpenRead(openDialog.FileName));
 
@@ -108,12 +109,12 @@ namespace StarterEdit
         public void writeBattlePkm(long[] offsetArray, StreamWriter writer, int pkm1, int pkm2, int pkm3) // Pokemon 1,2 and 3 values from nameList
         {
             int[] pokemonArray = new int[] { pkm1, pkm2, pkm3 }; // the game might default to bulbasurs position if this is changed
-            for (int i = 0; i < offsetArray.Length; i++)
-            {
-                writer.BaseStream.Position = offsetArray[i];
-                writer.BaseStream.WriteByte((byte)pokemonArray[i]);
-                writer.Flush();
-            }
+                for (int i = 0; i < offsetArray.Length; i++)
+                {
+                    writer.BaseStream.Position = offsetArray[i];
+                    writer.BaseStream.WriteByte((byte)pokemonArray[i]);
+                    writer.Flush();
+                }
         }
 
         public void readBattleLvls(long[] offsetArray, BinaryReader reader, TextBox levelBox, TextBox levelBox2, TextBox levelBox3)
@@ -139,6 +140,16 @@ namespace StarterEdit
                 writer.BaseStream.WriteByte((byte)Int32.Parse(levelBoxes[i].Text.ToString()));
                 writer.Flush();
             }
+        }
+        
+        public bool isTextAllowed(string text) // checks to see if the input given is text
+        {
+            return !numbersOnly.IsMatch(text);
+        }
+
+        private void PreviewTextInput(object sender, TextCompositionEventArgs e) // method is called when the textbox is active preventing invalid inputs: i.e text
+        {
+            e.Handled = !isTextAllowed(e.Text);
         }
     }
         
