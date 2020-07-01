@@ -10,4 +10,8 @@
     <Folder Include="Properties\DataSources\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="3.8.1" />
+  </ItemGroup>
+
 </Project>
