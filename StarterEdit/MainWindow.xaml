@@ -7,50 +7,51 @@
         xmlns:Collections="clr-namespace:System.Collections;assembly=System.Runtime.Extensions" x:Class="StarterEdit.MainWindow"
         mc:Ignorable="d"
         Title="Starter Edit" Height="202" Width="589" ResizeMode="NoResize">
-    <Grid Margin="0,0,0,-43" HorizontalAlignment="Center" Width="588">
-        <Grid HorizontalAlignment="Center" Height="59" VerticalAlignment="Top" Width="530" Margin="0,29,0,0">
-            <Label x:Name="Starter1" Content="Squirtle" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Starter One"/>
-            <Label x:Name="Starter2" Content="Bulbasaur" HorizontalAlignment="Left" Margin="206,0,0,0" VerticalAlignment="Top" ToolTip="Starter Two"/>
-            <Label x:Name="Starter3" Content="Charmander" HorizontalAlignment="Left" Margin="390,0,0,0" VerticalAlignment="Top" ToolTip="Starter Three"/>
-            <ComboBox x:Name="NameList" HorizontalAlignment="Left" Margin="0,37,0,0" VerticalAlignment="Top" Width="120" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names">
-                <ComboBox.DataContext>
-                    <local:PokemonData/>
-                </ComboBox.DataContext>
-            </ComboBox>
-            <ComboBox x:Name="NameList2" HorizontalAlignment="Left" Margin="206,37,0,0" VerticalAlignment="Top" Width="120" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names">
-                <ComboBox.DataContext>
-                    <local:PokemonData/>
-                </ComboBox.DataContext>
-            </ComboBox>
-            <ComboBox x:Name="NameList3" HorizontalAlignment="Left" Margin="390,37,0,0" VerticalAlignment="Top" Width="120" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names">
-                <ComboBox.DataContext>
-                    <local:PokemonData/>
-                </ComboBox.DataContext>
-            </ComboBox>
-        </Grid>
-        <Grid Margin="0,0,0,348">
-            <Menu Margin="0,0,0,-19">
-                <Menu/>
-                <MenuItem x:Name="menuFile" Header="File" Height="16" Width="32">
-                    <MenuItem x:Name="menuOpen" Header="Open" Click="menuOpen_Click"/>
-                    <MenuItem x:Name="menuSave" Header="Save" Click="menuSave_Click"/>
-                </MenuItem>
-            </Menu>
-        </Grid>
-        <TextBox x:Name="LevelBox" HorizontalAlignment="Left" Margin="29,115,0,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" ToolTip="Sets Pokemon level">
-            <TextBox.DataContext>
-                <local:Offsets/>
-            </TextBox.DataContext>
-        </TextBox>
-        <TextBox x:Name="LevelBox2" HorizontalAlignment="Center" Margin="0,115,0,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" ToolTip="Sets Pokemon level">
-            <TextBox.DataContext>
-                <local:Offsets/>
-            </TextBox.DataContext>
-        </TextBox>
-        <TextBox x:Name="LevelBox3" HorizontalAlignment="Left" Margin="418,115,0,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" ToolTip="Sets Pokemon level">
-            <TextBox.DataContext>
-                <local:Offsets/>
-            </TextBox.DataContext>
-        </TextBox>
-    </Grid>
+	<Grid Margin="0,0,0,-43" HorizontalAlignment="Center" Width="588">
+		<Grid HorizontalAlignment="Center" Height="59" VerticalAlignment="Top" Width="530" Margin="0,29,0,0">
+			<Label x:Name="Starter1" Content="Squirtle" HorizontalAlignment="Left" VerticalAlignment="Top" ToolTip="Starter One"/>
+			<Label x:Name="Starter2" Content="Bulbasaur" HorizontalAlignment="Left" Margin="206,0,0,0" VerticalAlignment="Top" ToolTip="Starter Two"/>
+			<Label x:Name="Starter3" Content="Charmander" HorizontalAlignment="Left" Margin="390,0,0,0" VerticalAlignment="Top" ToolTip="Starter Three"/>
+			<ComboBox x:Name="NameList" HorizontalAlignment="Left" Margin="0,37,0,0" VerticalAlignment="Top" Width="120" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names">
+				<ComboBox.DataContext>
+					<local:PokemonData/>
+				</ComboBox.DataContext>
+			</ComboBox>
+			<ComboBox x:Name="NameList2" HorizontalAlignment="Left" Margin="206,37,0,0" VerticalAlignment="Top" Width="120" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names">
+				<ComboBox.DataContext>
+					<local:PokemonData/>
+				</ComboBox.DataContext>
+			</ComboBox>
+			<ComboBox x:Name="NameList3" HorizontalAlignment="Left" Margin="390,37,0,0" VerticalAlignment="Top" Width="120" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names">
+				<ComboBox.DataContext>
+					<local:PokemonData/>
+				</ComboBox.DataContext>
+			</ComboBox>
+		</Grid>
+		<Grid Margin="0,0,0,348">
+			<Menu Margin="0,0,0,-19">
+				<Menu/>
+				<MenuItem x:Name="menuFile" Header="File" Height="16" Width="32">
+					<MenuItem x:Name="menuOpen" Header="Open" Click="menuOpen_Click"/>
+					<MenuItem x:Name="menuSave" Header="Save" Click="menuSave_Click"/>
+				</MenuItem>
+			</Menu>
+		</Grid>
+		<TextBox x:Name="LevelBox" HorizontalAlignment="Left" Margin="29,115,0,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" ToolTip="Sets Pokemon level" PreviewTextInput="PreviewTextInput">
+			<TextBox.DataContext>
+				<local:Offsets/>
+			</TextBox.DataContext>
+		</TextBox>
+		<TextBox x:Name="LevelBox2" HorizontalAlignment="Center" Margin="0,115,0,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" ToolTip="Sets Pokemon level" PreviewTextInput="PreviewTextInput">
+			<TextBox.DataContext>
+				<local:Offsets/>
+			</TextBox.DataContext>
+
+		</TextBox>
+		<TextBox x:Name="LevelBox3" HorizontalAlignment="Left" Margin="418,115,0,0" Text="0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" ToolTip="Sets Pokemon level" PreviewTextInput="PreviewTextInput">
+			<TextBox.DataContext>
+				<local:Offsets/>
+			</TextBox.DataContext>
+		</TextBox>
+	</Grid>
 </Window>
