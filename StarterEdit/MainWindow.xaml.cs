@@ -15,6 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 using System.Text.RegularExpressions;
+using System.Runtime.InteropServices;
 
 namespace StarterEdit
 {
@@ -29,6 +30,7 @@ namespace StarterEdit
         long[] sqrtlOffsets;
         long[] bulbOffsets;
         long[] charmOffsets;
+        long[] romName;
         byte[] currentPokmon = new byte[3];
 
 
@@ -46,6 +48,7 @@ namespace StarterEdit
             bulbOffsets = offsets.getBulbasuarOffsets();
             charmOffsets = offsets.getCharmanderOffsets();
             sqrtlOffsets = offsets.getSquirtleOffsets();
+            romName = offsets.getRomName();
             //offsets.FirstBattleOffsets;
            
         }
@@ -59,9 +62,25 @@ namespace StarterEdit
             readStarterPokemon(sqrtlOffsets, reader, Starter1, NameList, 0);
             readStarterPokemon(bulbOffsets, reader, Starter2, NameList2, 1);
             readStarterPokemon(charmOffsets, reader, Starter3, NameList3, 2);
-
+            StarterEditWindow.Title = "Starter Edit | " + getRomLoaded(reader, romName);
             readBattleLvls(offsets.FirstBattleLevels, reader, LevelBox, LevelBox2, LevelBox3);
             reader.Close();
+        }
+
+        public string getRomLoaded(BinaryReader reader, long[] romName)
+        {
+            string rName = "";
+            char[] name = new char[17];
+            for (int i = 0; i < romName.Length; i++)
+            {
+                reader.BaseStream.Position = romName[i];
+                string hexVal = string.Format("{0:X}", reader.ReadByte());
+                int decVal = Convert.ToInt32(hexVal, 16);
+
+                name[i] = Convert.ToChar(decVal);
+                rName = string.Concat(name);
+            }
+            return rName.Trim();
         }
 
         public void readStarterPokemon(long[] offsetArray, BinaryReader reader, Label Starter, ComboBox List, int starterNumber)
