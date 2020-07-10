@@ -7,11 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Starter-Edit-Icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Properties\DataSources\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit" Version="3.8.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Starter-Edit-Icon.png" />
   </ItemGroup>
 
 </Project>

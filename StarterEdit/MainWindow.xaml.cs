@@ -22,6 +22,7 @@ namespace StarterEdit
     public partial class MainWindow : Window
     {
         public readonly Regex numbersOnly = new Regex("[^0-9.-]+"); // Used force text input on the text boxes
+        int maxNumber = 254;
         Dictionary<int, string> pokemonNames = new Dictionary<int, string>();
         PokemonData pokemonData = new PokemonData();
         Offsets offsets = new Offsets();
@@ -104,6 +105,7 @@ namespace StarterEdit
             writeStarterPokemon(bulbOffsets, writer, NameList2.SelectedIndex, 1);
             writeStarterPokemon(charmOffsets, writer, NameList3.SelectedIndex, 2);
 
+            isNumbersUnder(LevelBox, LevelBox2, LevelBox3); // if the number inputted is > 254 it will be set to 254 as that's the max number the games can handle, otherwise it glitches out
             writeBattleLvls(offsets.FirstBattleLevels, writer, LevelBox, LevelBox2, LevelBox3);
             writeBattlePkm(offsets.FirstBattlePokemon, writer, NameList.SelectedIndex, NameList2.SelectedIndex, NameList3.SelectedIndex);
 
@@ -158,6 +160,20 @@ namespace StarterEdit
 
                 writer.BaseStream.WriteByte((byte)Int32.Parse(levelBoxes[i].Text.ToString()));
                 writer.Flush();
+            }
+        }
+
+        public void isNumbersUnder(TextBox levelBox, TextBox levelBox2, TextBox levelBox3)
+        {
+            TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
+            for (int i = 0; i < levelBoxes.Length; i++)
+            {
+                int number = Convert.ToInt32(levelBoxes[i].Text);
+                if (number > maxNumber)
+                {
+                    levelBoxes[i].Text = maxNumber.ToString();
+                }
+                number = 0;
             }
         }
         
