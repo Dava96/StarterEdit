@@ -56,16 +56,24 @@ namespace StarterEdit
 
         private void menuOpen_Click(object sender, RoutedEventArgs e)
         {
-            openDialog.Filter = "PKM R/B (*.gb)|*.gb";
-            openDialog.ShowDialog();
-            BinaryReader reader = new BinaryReader(File.OpenRead(openDialog.FileName));
+            try
+            {
+                openDialog.Filter = "PKM R/B (*.gb)|*.gb";
+                openDialog.ShowDialog();
+                BinaryReader reader = new BinaryReader(File.OpenRead(openDialog.FileName));
 
-            readStarterPokemon(sqrtlOffsets, reader, Starter1, NameList, 0);
-            readStarterPokemon(bulbOffsets, reader, Starter2, NameList2, 1);
-            readStarterPokemon(charmOffsets, reader, Starter3, NameList3, 2);
-            StarterEditWindow.Title = "Starter Edit | " + getRomLoaded(reader, romName);
-            readBattleLvls(offsets.FirstBattleLevels, reader, LevelBox, LevelBox2, LevelBox3);
-            reader.Close();
+                readStarterPokemon(sqrtlOffsets, reader, Starter1, NameList, 0);
+                readStarterPokemon(bulbOffsets, reader, Starter2, NameList2, 1);
+                readStarterPokemon(charmOffsets, reader, Starter3, NameList3, 2);
+                StarterEditWindow.Title = "Starter Edit | " + getRomLoaded(reader, romName);
+                readBattleLvls(offsets.FirstBattleLevels, reader, LevelBox, LevelBox2, LevelBox3);
+                reader.Close();
+            }
+            catch (FileNotFoundException args)
+            {
+                MessageBox.Show("File Not Found", "File Not found", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Console.WriteLine(args);
+            }
         }
 
         public string getRomLoaded(BinaryReader reader, long[] romName)
@@ -99,19 +107,27 @@ namespace StarterEdit
         }
 
         private void menuSave_Click(object sender, RoutedEventArgs e)
-        { 
-            StreamWriter writer = new StreamWriter(File.OpenWrite(openDialog.FileName));
-            writeStarterPokemon(sqrtlOffsets, writer, NameList.SelectedIndex, 0);
-            writeStarterPokemon(bulbOffsets, writer, NameList2.SelectedIndex, 1);
-            writeStarterPokemon(charmOffsets, writer, NameList3.SelectedIndex, 2);
+        {
+            try
+            {
+                StreamWriter writer = new StreamWriter(File.OpenWrite(openDialog.FileName));
+                writeStarterPokemon(sqrtlOffsets, writer, NameList.SelectedIndex, 0);
+                writeStarterPokemon(bulbOffsets, writer, NameList2.SelectedIndex, 1);
+                writeStarterPokemon(charmOffsets, writer, NameList3.SelectedIndex, 2);
 
-            isNumbersUnder(LevelBox, LevelBox2, LevelBox3); // if the number inputted is > 254 it will be set to 254 as that's the max number the games can handle, otherwise it glitches out
-            writeBattleLvls(offsets.FirstBattleLevels, writer, LevelBox, LevelBox2, LevelBox3);
-            writeBattlePkm(offsets.FirstBattlePokemon, writer, NameList.SelectedIndex, NameList2.SelectedIndex, NameList3.SelectedIndex);
+                isNumbersUnder(LevelBox, LevelBox2, LevelBox3); // if the number inputted is > 254 it will be set to 254 as that's the max number the games can handle, otherwise it glitches out
+                writeBattleLvls(offsets.FirstBattleLevels, writer, LevelBox, LevelBox2, LevelBox3);
+                writeBattlePkm(offsets.FirstBattlePokemon, writer, NameList.SelectedIndex, NameList2.SelectedIndex, NameList3.SelectedIndex);
 
-            MessageBox.Show("Changes saved succesfully", "Changes saved");
-            writer.Close();
-
+                MessageBox.Show("Changes saved succesfully", "Changes saved");
+                writer.Close();
+            }
+            catch (ArgumentException args)
+            {
+                MessageBox.Show("Please Open a file before trying to save.", "No File Selected Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Console.WriteLine(args);
+                //this.Close();
+            }
         }
 
         public void writeStarterPokemon(long[] offsetArray, StreamWriter writer, int pokemonValue, int starterNumber)
