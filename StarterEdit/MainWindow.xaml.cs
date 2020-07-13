@@ -69,10 +69,17 @@ namespace StarterEdit
                 readBattleLvls(offsets.FirstBattleLevels, reader, LevelBox, LevelBox2, LevelBox3);
                 reader.Close();
             }
-            catch (FileNotFoundException args)
+            catch (Exception args)
             {
-                MessageBox.Show("File Not Found", "File Not found", MessageBoxButton.OK, MessageBoxImage.Warning);
-                Console.WriteLine(args);
+                if (args is FileNotFoundException)
+                {
+                    MessageBox.Show("File Not Found", "File Not found", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Console.WriteLine(args);
+                }
+                else if (args is ArgumentException) {
+                    MessageBox.Show("Please Select a Pokemon Red/Blue rom.", "No File selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    Console.WriteLine(args);
+                }
             }
         }
 
