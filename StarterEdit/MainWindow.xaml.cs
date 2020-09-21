@@ -39,10 +39,13 @@ namespace StarterEdit
         {
             InitializeComponent();
 
-            NameList.ItemsSource = pokemonData.getPokemonNames();
+            NameList.ItemsSource = pokemonData.getPokemonNames(); // handles your choice
             NameList2.ItemsSource = pokemonData.getPokemonNames();
             NameList3.ItemsSource = pokemonData.getPokemonNames();
 
+            NameList4.ItemsSource = pokemonData.getPokemonNames(); // handles rivals choice
+            NameList5.ItemsSource = pokemonData.getPokemonNames();
+            NameList6.ItemsSource = pokemonData.getPokemonNames();
 
            
             pkmNames = pokemonData.getPokemonNames();
@@ -65,6 +68,12 @@ namespace StarterEdit
                 readStarterPokemon(sqrtlOffsets, reader, Starter1, NameList, 0);
                 readStarterPokemon(bulbOffsets, reader, Starter2, NameList2, 1);
                 readStarterPokemon(charmOffsets, reader, Starter3, NameList3, 2);
+
+                readStarterPokemon(offsets.rivalsChoice1, reader, RivalStarter, NameList4, 0);
+                readStarterPokemon(offsets.rivalsChoice2, reader, RivalStarter2, NameList5, 1);
+                readStarterPokemon(offsets.rivalsChoice3, reader, RivalStarter3, NameList6, 2);
+             
+
                 StarterEditWindow.Title = "Starter Edit | " + getRomLoaded(reader, romName);
                 readBattleLvls(offsets.FirstBattleLevels, reader, LevelBox, LevelBox2, LevelBox3);
                 reader.Close();
@@ -122,9 +131,12 @@ namespace StarterEdit
                 writeStarterPokemon(bulbOffsets, writer, NameList2.SelectedIndex, 1);
                 writeStarterPokemon(charmOffsets, writer, NameList3.SelectedIndex, 2);
 
+
+                writeBattlePkm(offsets.FirstBattlePokemon1, writer, NameList4.SelectedIndex, NameList5.SelectedIndex, NameList6.SelectedIndex);
+
                 isNumbersUnder(LevelBox, LevelBox2, LevelBox3); // if the number inputted is > 254 it will be set to 254 as that's the max number the games can handle, otherwise it glitches out
-                writeBattleLvls(offsets.FirstBattleLevels, writer, LevelBox, LevelBox2, LevelBox3);
-                writeBattlePkm(offsets.FirstBattlePokemon, writer, NameList.SelectedIndex, NameList2.SelectedIndex, NameList3.SelectedIndex);
+                writeBattleLvls(offsets.FirstBattleLevels, writer, LevelBox, LevelBox2, LevelBox3); // writes the rivals levels for the first battle
+                writeBattlePkm(offsets.FirstBattlePokemon1, writer, NameList4.SelectedIndex, NameList5.SelectedIndex, NameList6.SelectedIndex);
 
                 MessageBox.Show("Changes saved succesfully", "Changes saved");
                 writer.Close();
