@@ -132,11 +132,10 @@ namespace StarterEdit
                 writeStarterPokemon(charmOffsets, writer, NameList3.SelectedIndex, 2);
 
 
-                writeBattlePkm(offsets.FirstBattlePokemon1, writer, NameList4.SelectedIndex, NameList5.SelectedIndex, NameList6.SelectedIndex);
 
                 isNumbersUnder(LevelBox, LevelBox2, LevelBox3); // if the number inputted is > 254 it will be set to 254 as that's the max number the games can handle, otherwise it glitches out
                 writeBattleLvls(offsets.FirstBattleLevels, writer, LevelBox, LevelBox2, LevelBox3); // writes the rivals levels for the first battle
-                writeBattlePkm(offsets.FirstBattlePokemon1, writer, NameList4.SelectedIndex, NameList5.SelectedIndex, NameList6.SelectedIndex);
+                writeBattlePkm(offsets.FirstBattlePokemon, writer, NameList4.SelectedIndex, NameList5.SelectedIndex, NameList6.SelectedIndex);
 
                 MessageBox.Show("Changes saved succesfully", "Changes saved");
                 writer.Close();

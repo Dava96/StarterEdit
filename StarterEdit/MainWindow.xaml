@@ -6,10 +6,12 @@
         xmlns:local="clr-namespace:StarterEdit"
         xmlns:Collections="clr-namespace:System.Collections;assembly=System.Runtime.Extensions" x:Name="StarterEditWindow" x:Class="StarterEdit.MainWindow"
         mc:Ignorable="d"
-        Title="Starter Edit" Height="240" Width="472" ResizeMode="NoResize" Icon="/Starter-Edit-Icon.png">
+        Title="Starter Edit" Height="319" Width="577" ResizeMode="NoResize" Icon="/Starter-Edit-Icon.png">
 
     <Grid Margin="0,0,0,0">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -51,6 +53,12 @@
             <TextBox x:Name="LevelBox2" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
             <TextBox x:Name="LevelBox3" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
         </UniformGrid>
-        
+
+        <Separator Grid.Row="4" Visibility="Hidden"></Separator>
+        <UniformGrid Grid.Row="4" Columns="1" Rows="1">
+            <Label x:Name="RivalBattles" Content="Rival Battles" ToolTip="All rival battles are under this section" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+        </UniformGrid>
+        <Separator Grid.Row="5" Visibility="Hidden"></Separator>
+
     </Grid>
 </Window>
