@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:StarterEdit"
         xmlns:Collections="clr-namespace:System.Collections;assembly=System.Runtime.Extensions" x:Name="StarterEditWindow" x:Class="StarterEdit.MainWindow"
         mc:Ignorable="d"
-        Title="Starter Edit" Height="319" Width="577" ResizeMode="NoResize" Icon="/Starter-Edit-Icon.png">
+        Title="Starter Edit" Height="411" Width="577" ResizeMode="NoResize" Icon="/Starter-Edit-Icon.png">
 
     <Grid Margin="0,0,0,0">
         <Grid.RowDefinitions>
@@ -16,6 +16,8 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0" Padding="2,2,2,4">
@@ -33,10 +35,10 @@
             <ComboBox x:Name="NameList2" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
             <ComboBox x:Name="NameList3" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
         </UniformGrid>
-        
+
         <Separator Grid.Row="2" Visibility="Hidden"></Separator>
         <UniformGrid Grid.Row="2" Columns="1" Rows="1">
-            <Label x:Name="Battle1" Content="Rivals Choice" ToolTip="The Rivals Starter Pokemon" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+            <Label x:Name="Battle1" Content="Rivals Choice" ToolTip="The Rivals Starter Pokemon" HorizontalAlignment="Center" VerticalAlignment="Stretch" FontWeight="Bold"/>
         </UniformGrid>
         <Separator Grid.Row="3" Visibility="Hidden"></Separator>
 
@@ -56,9 +58,42 @@
 
         <Separator Grid.Row="4" Visibility="Hidden"></Separator>
         <UniformGrid Grid.Row="4" Columns="1" Rows="1">
-            <Label x:Name="RivalBattles" Content="Rival Battles" ToolTip="All rival battles are under this section" HorizontalAlignment="Center" VerticalAlignment="Stretch"/>
+            <Label x:Name="RivalBattle1s" Content="Rival Battles" ToolTip="All rival battles are under this section" HorizontalAlignment="Center" VerticalAlignment="Stretch" FontWeight="Bold"/>
         </UniformGrid>
         <Separator Grid.Row="5" Visibility="Hidden"></Separator>
 
+        <Separator Grid.Row="5" Visibility="Hidden"></Separator>
+        <UniformGrid Grid.Row="5" Columns="3" Rows="3">
+        <ComboBox x:Name="BattleLocations" SelectedIndex="0" SelectionChanged="BattleLocations_SelectionChanged"/>
+        <Label Content="Players Starter Choice" VerticalAlignment="Center" HorizontalAlignment="Center" />
+            <Label/>
+
+        <RadioButton x:Name="playerChoice" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <RadioButton x:Name="playerChoice2" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+        <RadioButton x:Name="playerChoice3" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+
+        </UniformGrid>
+        
+        <Separator Grid.Row="6" Visibility="Hidden"></Separator>
+        <UniformGrid x:Name="battles" Grid.Row="6" Columns="4" Rows="3">
+            <ComboBox x:Name="BattlePokemon1" SelectedIndex="0"/>
+            <TextBox x:Name="BattleLvl" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
+
+            <ComboBox x:Name="BattlePokemon2" SelectedIndex="0" />
+            <TextBox x:Name="BattleLvl2" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
+
+            <ComboBox x:Name="BattlePokemon3" SelectedIndex="0"/>
+            <TextBox x:Name="BattleLvl3" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
+
+            <ComboBox x:Name="BattlePokemon4" SelectedIndex="0"/>
+            <TextBox x:Name="BattleLvl4" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
+
+            <ComboBox x:Name="BattlePokemon5" SelectedIndex="0" />
+            <TextBox x:Name="BattleLvl5" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
+
+            <ComboBox x:Name="BattlePokemon6" SelectedIndex="0" />
+            <TextBox x:Name="BattleLvl6" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
+        </UniformGrid>
+        
     </Grid>
 </Window>
