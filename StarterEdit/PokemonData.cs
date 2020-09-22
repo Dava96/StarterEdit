@@ -13,6 +13,7 @@ namespace StarterEdit
         public string[] pokemonHexValues;
         public string[] pokemonNames;
         public string[] pokedexOrderedNames;
+        public string[] battleLocations = new string[] { "Route 22 (1)", "Cerulean City", "S.S Anne", "Pokemon Tower", "Silph Co.", "Route 22 (2)", "Indigo Plateau"};
         private StreamReader readNames;
 
         // to do make a seperate window for the trainer editor
@@ -92,6 +93,11 @@ namespace StarterEdit
         public int[] getPokemonDecimals()
         {
             return pokemonDecimals;
+        }
+
+        public string[] getBattleLocations()
+        {
+            return battleLocations;
         }
 
     }
