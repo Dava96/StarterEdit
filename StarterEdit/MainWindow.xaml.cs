@@ -47,7 +47,8 @@ namespace StarterEdit
             NameList5.ItemsSource = pokemonData.getPokemonNames();
             NameList6.ItemsSource = pokemonData.getPokemonNames();
 
-           
+            BattleLocations.ItemsSource = pokemonData.getBattleLocations(); // gets battle locations
+    
             pkmNames = pokemonData.getPokemonNames();
             bulbOffsets = offsets.getBulbasuarOffsets();
             charmOffsets = offsets.getCharmanderOffsets();
@@ -120,6 +121,7 @@ namespace StarterEdit
             Starter.Content = pkmNames[decVal];
             List.SelectedIndex = decVal;
             currentPokmon[starterNumber] = (byte)decVal;
+            setPlayerChoice();
         }
 
         private void menuSave_Click(object sender, RoutedEventArgs e)
@@ -219,6 +221,99 @@ namespace StarterEdit
         private void PreviewTextInput(object sender, TextCompositionEventArgs e) // method is called when the textbox is active preventing invalid inputs: i.e text
         {
             e.Handled = !isTextAllowed(e.Text);
+        }
+
+        private void setPlayerChoice()
+        {
+            // sets the radio buttons text to what the players choice of starter is
+            playerChoice.Content = Starter1.Content.ToString();
+            playerChoice2.Content = Starter2.Content.ToString();
+            playerChoice3.Content = Starter3.Content.ToString();
+        }
+
+        private void BattleLocations_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            int selectedIndex;
+            selectedIndex = BattleLocations.SelectedIndex;
+            switch (selectedIndex)
+            {
+                case 0: // route 22 battle 1
+                    BattleLvl3.IsEnabled = false;
+                    BattlePokemon3.IsEnabled = false;
+                    BattleLvl4.IsEnabled = false;
+                    BattlePokemon4.IsEnabled = false;
+                    BattleLvl5.IsEnabled = false;
+                    BattlePokemon5.IsEnabled = false;
+                    BattleLvl6.IsEnabled = false;
+                    BattlePokemon6.IsEnabled = false;
+                    break;
+
+                case 1: // cerulean city
+                    BattleLvl3.IsEnabled = true;
+                    BattlePokemon3.IsEnabled = true;
+                    BattleLvl4.IsEnabled = true;
+                    BattlePokemon4.IsEnabled = true;
+                    BattleLvl5.IsEnabled = false;
+                    BattlePokemon5.IsEnabled = false;
+                    BattleLvl6.IsEnabled = false;
+                    BattlePokemon6.IsEnabled = false;
+                    break;
+
+                case 2: // S.S Anne
+                    BattleLvl3.IsEnabled = true;
+                    BattlePokemon3.IsEnabled = true;
+                    BattleLvl4.IsEnabled = true;
+                    BattlePokemon4.IsEnabled = true;
+                    BattleLvl5.IsEnabled = false;
+                    BattlePokemon5.IsEnabled = false;
+                    BattleLvl6.IsEnabled = false;
+                    BattlePokemon6.IsEnabled = false;
+                    break;
+
+                case 3: // pokemon tower
+                    BattleLvl3.IsEnabled = true;
+                    BattlePokemon3.IsEnabled = true;
+                    BattleLvl4.IsEnabled = true;
+                    BattlePokemon4.IsEnabled = true;
+                    BattleLvl5.IsEnabled = true;
+                    BattlePokemon5.IsEnabled = true;
+                    BattleLvl6.IsEnabled = false;
+                    BattlePokemon6.IsEnabled = false;
+                    break;
+
+                case 4: // silph co
+                    BattleLvl3.IsEnabled = true;
+                    BattlePokemon3.IsEnabled = true;
+                    BattleLvl4.IsEnabled = true;
+                    BattlePokemon4.IsEnabled = true;
+                    BattleLvl5.IsEnabled = true;
+                    BattlePokemon5.IsEnabled = true;
+                    BattleLvl6.IsEnabled = false;
+                    BattlePokemon6.IsEnabled = false;
+                    break;
+
+                case 5: // route 22 battle 2
+                    BattleLvl3.IsEnabled = true;
+                    BattlePokemon3.IsEnabled = true;
+                    BattleLvl4.IsEnabled = true;
+                    BattlePokemon4.IsEnabled = true;
+                    BattleLvl5.IsEnabled = true;
+                    BattlePokemon5.IsEnabled = true;
+                    BattleLvl6.IsEnabled = true;
+                    BattlePokemon6.IsEnabled = true;
+                    break;
+
+                case 6: // indigo plateau
+                    BattleLvl3.IsEnabled = true;
+                    BattlePokemon3.IsEnabled = true;
+                    BattleLvl4.IsEnabled = true;
+                    BattlePokemon4.IsEnabled = true;
+                    BattleLvl5.IsEnabled = true;
+                    BattlePokemon5.IsEnabled = true;
+                    BattleLvl6.IsEnabled = true;
+                    BattlePokemon6.IsEnabled = true;
+                    break;
+            }
         }
     }
         
