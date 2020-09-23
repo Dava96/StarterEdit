@@ -51,9 +51,9 @@
             <ComboBox x:Name="NameList5" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
             <ComboBox x:Name="NameList6" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
 
-            <TextBox x:Name="LevelBox" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
-            <TextBox x:Name="LevelBox2" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
-            <TextBox x:Name="LevelBox3" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
+            <TextBox x:Name="LevelBox" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
+            <TextBox x:Name="LevelBox2" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
+            <TextBox x:Name="LevelBox3" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
         </UniformGrid>
 
         <Separator Grid.Row="4" Visibility="Hidden"></Separator>
@@ -77,22 +77,22 @@
         <Separator Grid.Row="6" Visibility="Hidden"></Separator>
         <UniformGrid x:Name="battles" Grid.Row="6" Columns="4" Rows="3">
             <ComboBox x:Name="BattlePokemon1" SelectedIndex="0"/>
-            <TextBox x:Name="BattleLvl" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
+            <TextBox x:Name="BattleLvl" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
 
             <ComboBox x:Name="BattlePokemon2" SelectedIndex="0" />
-            <TextBox x:Name="BattleLvl2" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
+            <TextBox x:Name="BattleLvl2" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
 
             <ComboBox x:Name="BattlePokemon3" SelectedIndex="0"/>
-            <TextBox x:Name="BattleLvl3" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
+            <TextBox x:Name="BattleLvl3" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
 
             <ComboBox x:Name="BattlePokemon4" SelectedIndex="0"/>
-            <TextBox x:Name="BattleLvl4" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
+            <TextBox x:Name="BattleLvl4" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
 
             <ComboBox x:Name="BattlePokemon5" SelectedIndex="0" />
-            <TextBox x:Name="BattleLvl5" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
+            <TextBox x:Name="BattleLvl5" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
 
             <ComboBox x:Name="BattlePokemon6" SelectedIndex="0" />
-            <TextBox x:Name="BattleLvl6" Text="0" ToolTip="Sets Pokemon level" MaxLength="3"/>
+            <TextBox x:Name="BattleLvl6" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
         </UniformGrid>
         
     </Grid>
