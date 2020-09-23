@@ -136,6 +136,10 @@ namespace StarterEdit
 
 
                 isNumbersUnder(LevelBox, LevelBox2, LevelBox3); // if the number inputted is > 254 it will be set to 254 as that's the max number the games can handle, otherwise it glitches out
+                
+                isNumbersUnder(BattleLvl, BattleLvl2, BattleLvl3); // checks if the battle pokemons levels are under 254
+                isNumbersUnder(BattleLvl4, BattleLvl5, BattleLvl6);
+
                 writeBattleLvls(offsets.FirstBattleLevels, writer, LevelBox, LevelBox2, LevelBox3); // writes the rivals levels for the first battle
                 writeBattlePkm(offsets.FirstBattlePokemon, writer, NameList4.SelectedIndex, NameList5.SelectedIndex, NameList6.SelectedIndex);
 
@@ -176,40 +180,51 @@ namespace StarterEdit
 
         public void readBattleLvls(long[] offsetArray, BinaryReader reader, TextBox levelBox, TextBox levelBox2, TextBox levelBox3)
         {
-            TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
-            int pokemonLevel = 0;
-            for (int i = 0; i < offsetArray.Length; i++)
-            {
-                reader.BaseStream.Position = offsetArray[i];
-                string hexVal = string.Format("{0:X}", reader.ReadByte());
-                pokemonLevel = Convert.ToInt32(hexVal, 16);
-                levelBoxes[i].Text = pokemonLevel.ToString();
-            }
+                TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
+                int pokemonLevel = 0;
+                for (int i = 0; i < offsetArray.Length; i++)
+                {
+                    reader.BaseStream.Position = offsetArray[i];
+                    string hexVal = string.Format("{0:X}", reader.ReadByte());
+                    pokemonLevel = Convert.ToInt32(hexVal, 16);
+                    levelBoxes[i].Text = pokemonLevel.ToString();
+                }
         }
 
         public void writeBattleLvls(long[] offsetArray, StreamWriter writer, TextBox levelBox, TextBox levelBox2, TextBox levelBox3)
         {
-            TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
-            for (int i = 0; i < offsetArray.Length; i++)
             {
-                writer.BaseStream.Position = offsetArray[i];
 
-                writer.BaseStream.WriteByte((byte)Int32.Parse(levelBoxes[i].Text.ToString()));
-                writer.Flush();
+                TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
+                for (int i = 0; i < offsetArray.Length; i++)
+                {
+                    writer.BaseStream.Position = offsetArray[i];
+
+                    writer.BaseStream.WriteByte((byte)Int32.Parse(levelBoxes[i].Text.ToString()));
+                    writer.Flush();
+                }
             }
         }
 
         public void isNumbersUnder(TextBox levelBox, TextBox levelBox2, TextBox levelBox3)
         {
-            TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
-            for (int i = 0; i < levelBoxes.Length; i++)
+            try
             {
-                int number = Convert.ToInt32(levelBoxes[i].Text);
-                if (number > maxNumber)
+
+                TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
+                for (int i = 0; i < levelBoxes.Length; i++)
                 {
-                    levelBoxes[i].Text = maxNumber.ToString();
+                    int number = Convert.ToInt32(levelBoxes[i].Text);
+                    if (number > maxNumber)
+                    {
+                        levelBoxes[i].Text = maxNumber.ToString();
+                    }
+                    number = 0;
                 }
-                number = 0;
+            }
+            catch (System.FormatException args)
+            {
+                MessageBox.Show("Please Enter a number, i.e 25", "Invalid Input", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
         
