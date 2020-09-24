@@ -64,35 +64,35 @@
 
         <Separator Grid.Row="5" Visibility="Hidden"></Separator>
         <UniformGrid Grid.Row="5" Columns="3" Rows="3">
-        <ComboBox x:Name="BattleLocations" SelectedIndex="0" SelectionChanged="BattleLocations_SelectionChanged"/>
-        <Label Content="Players Starter Choice" VerticalAlignment="Center" HorizontalAlignment="Center" />
+        <ComboBox x:Name="BattleLocations" SelectedIndex="0" ToolTip="Battle locations" SelectionChanged="BattleLocations_SelectionChanged"/>
+        <Label Content="Players Starter Choice" VerticalAlignment="Center" ToolTip="Players potential starter Pokemon and Battles based on that choice" HorizontalAlignment="Center" />
             <Label/>
 
-        <RadioButton x:Name="playerChoice" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-        <RadioButton x:Name="playerChoice2" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-        <RadioButton x:Name="playerChoice3" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+        <RadioButton x:Name="playerChoice" ToolTip="Players Starter Pokemon" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <RadioButton x:Name="playerChoice2" ToolTip="Players Starter Pokemon" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+        <RadioButton x:Name="playerChoice3" ToolTip="Players Starter Pokemon" VerticalAlignment="Center" HorizontalAlignment="Left"/>
 
         </UniformGrid>
         
         <Separator Grid.Row="6" Visibility="Hidden"></Separator>
         <UniformGrid x:Name="battles" Grid.Row="6" Columns="4" Rows="3">
-            <ComboBox x:Name="BattlePokemon1" SelectedIndex="0"/>
-            <TextBox x:Name="BattleLvl" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
+            <ComboBox x:Name="BattlePokemon1" ToolTip="Rivals Pokemon in slot 1" SelectedIndex="0"/>
+            <TextBox x:Name="BattleLvl" Text="0" ToolTip="Sets Rivals Pokemon level in slot 1" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
 
-            <ComboBox x:Name="BattlePokemon2" SelectedIndex="0" />
-            <TextBox x:Name="BattleLvl2" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
+            <ComboBox x:Name="BattlePokemon2" ToolTip="Rivals Pokemon in slot 2"  SelectedIndex="0" />
+            <TextBox x:Name="BattleLvl2" Text="0" ToolTip="Sets Rivals Pokemon level in slot 2" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
 
-            <ComboBox x:Name="BattlePokemon3" SelectedIndex="0"/>
-            <TextBox x:Name="BattleLvl3" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
+            <ComboBox x:Name="BattlePokemon3" ToolTip="Rivals Pokemon in slot 3" SelectedIndex="0"/>
+            <TextBox x:Name="BattleLvl3" Text="0" ToolTip="Sets Rivals Pokemon level in slot 3" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
 
-            <ComboBox x:Name="BattlePokemon4" SelectedIndex="0"/>
-            <TextBox x:Name="BattleLvl4" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
+            <ComboBox x:Name="BattlePokemon4" ToolTip="Rivals Pokemon in slot 4" SelectedIndex="0"/>
+            <TextBox x:Name="BattleLvl4" Text="0" ToolTip="Sets Rivals Pokemon level in slot 4" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
 
-            <ComboBox x:Name="BattlePokemon5" SelectedIndex="0" />
-            <TextBox x:Name="BattleLvl5" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
+            <ComboBox x:Name="BattlePokemon5" ToolTip="Rivals Pokemon in slot 5" SelectedIndex="0" />
+            <TextBox x:Name="BattleLvl5" Text="0" ToolTip="Sets Rivals Pokemon level in slot 5"  MaxLength="3" PreviewTextInput="PreviewTextInput"/>
 
-            <ComboBox x:Name="BattlePokemon6" SelectedIndex="0" />
-            <TextBox x:Name="BattleLvl6" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
+            <ComboBox x:Name="BattlePokemon6" ToolTip="Rivals Pokemon in slot 6" SelectedIndex="0" />
+            <TextBox x:Name="BattleLvl6" Text="0" ToolTip="Sets Rivals Pokemon level in slot 6" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
         </UniformGrid>
         
     </Grid>
