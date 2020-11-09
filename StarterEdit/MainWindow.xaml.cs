@@ -23,7 +23,6 @@ namespace StarterEdit
     {
         public readonly Regex numbersOnly = new Regex("[^0-9.-]+"); // Used force text input on the text boxes
         int maxNumber = 254;
-        Dictionary<int, string> pokemonNames = new Dictionary<int, string>();
         PokemonData pokemonData = new PokemonData();
         Offsets offsets = new Offsets();
         static OpenFileDialog openDialog = new OpenFileDialog();
@@ -33,12 +32,16 @@ namespace StarterEdit
         long[] charmOffsets;
         long[] romName;
         byte[] currentPokmon = new byte[3];
+        BinaryReader reader;    
+
+        PlayersChoiceSquirtle playersChoiceSquirtle = new PlayersChoiceSquirtle();
+        PlayersChoiceBulbasaur playersChoiceBulbasaur = new PlayersChoiceBulbasaur();
+        PlayersChoiceCharmander playersChoiceCharmander = new PlayersChoiceCharmander();
 
 
         public MainWindow()
         {
             InitializeComponent();
-
             NameList.ItemsSource = pokemonData.getPokemonNames(); // handles your choice
             NameList2.ItemsSource = pokemonData.getPokemonNames();
             NameList3.ItemsSource = pokemonData.getPokemonNames();
@@ -54,8 +57,15 @@ namespace StarterEdit
             charmOffsets = offsets.getCharmanderOffsets();
             sqrtlOffsets = offsets.getSquirtleOffsets();
             romName = offsets.getRomName();
+
+            BattlePokemon1.ItemsSource = pokemonData.getPokemonNames();
+            BattlePokemon2.ItemsSource = pokemonData.getPokemonNames();
+            BattlePokemon3.ItemsSource = pokemonData.getPokemonNames();
+            BattlePokemon4.ItemsSource = pokemonData.getPokemonNames();
+            BattlePokemon5.ItemsSource = pokemonData.getPokemonNames();
+            BattlePokemon6.ItemsSource = pokemonData.getPokemonNames();
             //offsets.FirstBattleOffsets;
-           
+
         }
 
         private void menuOpen_Click(object sender, RoutedEventArgs e)
@@ -64,7 +74,7 @@ namespace StarterEdit
             {
                 openDialog.Filter = "PKM R/B (*.gb)|*.gb";
                 openDialog.ShowDialog();
-                BinaryReader reader = new BinaryReader(File.OpenRead(openDialog.FileName));
+                reader = new BinaryReader(File.Open(openDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.Write));
 
                 readStarterPokemon(sqrtlOffsets, reader, Starter1, NameList, 0);
                 readStarterPokemon(bulbOffsets, reader, Starter2, NameList2, 1);
@@ -73,11 +83,14 @@ namespace StarterEdit
                 readStarterPokemon(offsets.rivalsChoice1, reader, RivalStarter, NameList4, 0);
                 readStarterPokemon(offsets.rivalsChoice2, reader, RivalStarter2, NameList5, 1);
                 readStarterPokemon(offsets.rivalsChoice3, reader, RivalStarter3, NameList6, 2);
-             
+
+                playerChoice.IsEnabled = true;
+                playerChoice2.IsEnabled = true;
+                playerChoice3.IsEnabled = true;
 
                 StarterEditWindow.Title = "Starter Edit | " + getRomLoaded(reader, romName);
                 readBattleLvls(offsets.FirstBattleLevels, reader, LevelBox, LevelBox2, LevelBox3);
-                reader.Close();
+               // reader.Close();
             }
             catch (Exception args)
             {
@@ -124,11 +137,33 @@ namespace StarterEdit
             setPlayerChoice();
         }
 
+        public void readBattlePokemon(long[] offsetArray, BinaryReader reader, ComboBox pkm1, ComboBox pkm2, ComboBox pkm3, ComboBox pkm4, ComboBox pkm5, ComboBox pkm6)
+        {
+
+            ComboBox[] pokemon = new ComboBox[] { pkm1, pkm2, pkm3, pkm4, pkm5, pkm6 };
+            int decVal = 0;
+            for (int i = 0; i < offsetArray.Length; i++)
+            {
+                if (offsetArray[i] != 0x0)
+                {
+                reader.BaseStream.Position = offsetArray[i];
+                string hexVal = string.Format("{0:X}", reader.ReadByte());
+                decVal = Convert.ToInt32(hexVal, 16);
+                    pokemon[i].SelectedIndex = decVal;
+                } else if (offsetArray[i] == 0x0)
+                {
+                    pokemon[i].SelectedIndex = -1;
+                }
+            }
+        }
+
         private void menuSave_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                StreamWriter writer = new StreamWriter(File.OpenWrite(openDialog.FileName));
+               
+
+                StreamWriter writer = new StreamWriter(File.Open(openDialog.FileName, FileMode.Open, FileAccess.Write, FileShare.Read));
                 writeStarterPokemon(sqrtlOffsets, writer, NameList.SelectedIndex, 0);
                 writeStarterPokemon(bulbOffsets, writer, NameList2.SelectedIndex, 1);
                 writeStarterPokemon(charmOffsets, writer, NameList3.SelectedIndex, 2);
@@ -143,6 +178,11 @@ namespace StarterEdit
                 writeBattleLvls(offsets.FirstBattleLevels, writer, LevelBox, LevelBox2, LevelBox3); // writes the rivals levels for the first battle
                 writeBattlePkm(offsets.FirstBattlePokemon, writer, NameList4.SelectedIndex, NameList5.SelectedIndex, NameList6.SelectedIndex);
 
+                writeBattlePkm(playersChoiceSquirtle.squirtleBattle1Pkm, writer, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
+                    BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
+
+                writeBattleLvls(playersChoiceSquirtle.squirtleBattle1Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
+
                 MessageBox.Show("Changes saved succesfully", "Changes saved");
                 writer.Close();
             }
@@ -152,6 +192,12 @@ namespace StarterEdit
                 Console.WriteLine(args);
                 //this.Close();
             }
+            catch (System.IO.IOException args)
+            {
+                MessageBox.Show("Error" + args);
+                reader.Close();
+            }
+
         }
 
         public void writeStarterPokemon(long[] offsetArray, StreamWriter writer, int pokemonValue, int starterNumber)
@@ -178,6 +224,20 @@ namespace StarterEdit
                 }
         }
 
+        public void writeBattlePkm(long[] offsetArray, StreamWriter writer, int pkm1, int pkm2, int pkm3, int pkm4, int pkm5, int pkm6) // Pokemon 1,2 and 3 values from nameList
+        {
+            int[] pokemonArray = new int[] { pkm1, pkm2, pkm3, pkm4, pkm5, pkm6 }; // the game might default to bulbasurs position if this is changed
+            for (int i = 0; i < offsetArray.Length; i++)
+            {
+                if (pokemonArray[i] >= 0)
+                {
+                    writer.BaseStream.Position = offsetArray[i];
+                    writer.BaseStream.WriteByte((byte)pokemonArray[i]);
+                    writer.Flush();
+                }
+            }
+        }
+
         public void readBattleLvls(long[] offsetArray, BinaryReader reader, TextBox levelBox, TextBox levelBox2, TextBox levelBox3)
         {
                 TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
@@ -191,12 +251,46 @@ namespace StarterEdit
                 }
         }
 
+        
+        public void readBattleLvls(long[] levelArray, BinaryReader reader, TextBox box1, TextBox box2, TextBox box3, TextBox box4, TextBox box5, TextBox box6 )
+        {
+            TextBox[] battleBoxes = new TextBox[] { box1, box2, box3, box4, box5, box6 };
+            int pokemonLevel = 0;
+            for (int i = 0; i < levelArray.Length; i++)
+            {
+                if (levelArray[i] != 0x0)
+                {
+                    reader.BaseStream.Position = levelArray[i];
+                    string hexVal = string.Format("{0:X}", reader.ReadByte());
+                    pokemonLevel = Convert.ToInt32(hexVal, 16);
+                    battleBoxes[i].Text = pokemonLevel.ToString();
+                }
+            }
+        }
+
+
         public void writeBattleLvls(long[] offsetArray, StreamWriter writer, TextBox levelBox, TextBox levelBox2, TextBox levelBox3)
         {
             {
 
                 TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
                 for (int i = 0; i < offsetArray.Length; i++)
+                {
+                    writer.BaseStream.Position = offsetArray[i];
+
+                    writer.BaseStream.WriteByte((byte)Int32.Parse(levelBoxes[i].Text.ToString()));
+                    writer.Flush();
+                }
+            }
+        }
+
+        public void writeBattleLvls(long[] offsetArray, StreamWriter writer, TextBox levelBox, TextBox levelBox2, TextBox levelBox3, TextBox levelBox4, TextBox levelBox5, TextBox levelBox6)
+        {
+            TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3, levelBox4, levelBox5, levelBox6 };
+
+            for (int i = 0; i < offsetArray.Length; i++)
+            {
+                if (!levelBoxes[i].Text.Equals("0"))
                 {
                     writer.BaseStream.Position = offsetArray[i];
 
@@ -246,6 +340,7 @@ namespace StarterEdit
             playerChoice3.Content = Starter3.Content.ToString();
         }
 
+
         private void BattleLocations_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int selectedIndex;
@@ -261,6 +356,13 @@ namespace StarterEdit
                     BattlePokemon5.IsEnabled = false;
                     BattleLvl6.IsEnabled = false;
                     BattlePokemon6.IsEnabled = false;
+
+                    if (isSquirtleChecked())
+                    {
+                        readBattleLvls(playersChoiceSquirtle.squirtleBattle1Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
+                        readBattlePokemon(playersChoiceSquirtle.squirtleBattle1Pkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
+                    }
+
                     break;
 
                 case 1: // cerulean city
@@ -330,6 +432,67 @@ namespace StarterEdit
                     break;
             }
         }
-    }
-        
+
+        private void playerChoice_Checked(object sender, RoutedEventArgs e) // squirtle radio button
+        {
+            if (playerChoice.IsChecked == true && BattleLocations.SelectedIndex == 0)
+            {
+                playerChoice2.SetCurrentValue(RadioButton.IsCheckedProperty, false);
+                playerChoice3.SetCurrentValue(RadioButton.IsCheckedProperty, false);
+
+                readBattleLvls(playersChoiceSquirtle.squirtleBattle1Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
+                readBattlePokemon(playersChoiceSquirtle.squirtleBattle1Pkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
+
+            } else if (BattleLocations.SelectedIndex == 1)
+            {
+                readBattleLvls(playersChoiceSquirtle.squirtleBattle2Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
+                readBattlePokemon(playersChoiceSquirtle.squirtleBattle2Pkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
+            }
+
+        }
+
+        private void playerChoice2_Checked(object sender, RoutedEventArgs e) // bulbasaur radio button
+        {
+            if (playerChoice2.IsChecked == true)
+            {
+                playerChoice.SetCurrentValue(RadioButton.IsCheckedProperty, false);
+                playerChoice3.SetCurrentValue(RadioButton.IsCheckedProperty, false);
+
+                readBattleLvls(playersChoiceBulbasaur.bulbasurBattle1Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
+                readBattlePokemon(playersChoiceBulbasaur.bulbasaurBattle1Pkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
+
+            }
+
+        }
+
+
+        private void playerChoice3_Checked(object sender, RoutedEventArgs e) // charmander radio button 
+        {
+            if (playerChoice3.IsChecked == true)
+            {
+                playerChoice2.SetCurrentValue(RadioButton.IsCheckedProperty, false);
+                playerChoice.SetCurrentValue(RadioButton.IsCheckedProperty, false);
+
+                readBattleLvls(playersChoiceCharmander.charmanderBattle1Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
+                readBattlePokemon(playersChoiceCharmander.charmanderBattle1Pkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
+                
+            }
+
+        }
+
+        public Boolean isSquirtleChecked()
+        {
+            return (bool)playerChoice.IsChecked;
+        }
+
+        public Boolean isBulbasuarChecked()
+        {
+            return (bool)playerChoice2.IsChecked;
+        }
+
+        public Boolean isCharmanderChecked()
+        {
+            return (bool)playerChoice3.IsChecked;
+        }
+    }    
 }
