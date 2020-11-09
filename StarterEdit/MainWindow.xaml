@@ -68,9 +68,9 @@
         <Label Content="Players Starter Choice" VerticalAlignment="Center" ToolTip="Players potential starter Pokemon and Battles based on that choice" HorizontalAlignment="Center" />
             <Label/>
 
-        <RadioButton x:Name="playerChoice" Content="Squirtle" ToolTip="Players Starter Pokemon" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-        <RadioButton x:Name="playerChoice2" Content="Bulbasaur" ToolTip="Players Starter Pokemon" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-        <RadioButton x:Name="playerChoice3" Content="Charmander" ToolTip="Players Starter Pokemon" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+        <RadioButton x:Name="playerChoice" Content="Squirtle" ToolTip="Players Starter Pokemon" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="playerChoice_Checked" IsEnabled="False"/>
+        <RadioButton x:Name="playerChoice2" Content="Bulbasaur" ToolTip="Players Starter Pokemon" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="False" Checked="playerChoice2_Checked" IsEnabled="False"/>
+        <RadioButton x:Name="playerChoice3" Content="Charmander" ToolTip="Players Starter Pokemon" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="False" Checked="playerChoice3_Checked" IsEnabled="False"/>
 
         </UniformGrid>
         
