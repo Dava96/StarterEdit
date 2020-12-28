@@ -15,7 +15,7 @@ namespace StarterEdit
         public long[] rivalsChoice2 = new long[] { 0x3A1EB }; // rivals choice if you pick charmander, normally squirtle
         public long[] rivalsChoice3 = new long[] { 0x3A1E5 }; // rivals choice if you pick bulbasuar, normally charmander
 
-        public long[] FirstBattleLevels = new long[] { 0x3A1E4, 0x3A1E7, 0x3A1EA };
+        public long[] FirstBattleLevels = new long[] {0x3A1E7, 0x3A1EA, 0x3A1E4 };
         public long[] FirstBattlePokemon = new long[] {0x3A1E8, 0x3A1EB, 0x3A1E5 };
 
                                                                                    
@@ -41,7 +41,7 @@ namespace StarterEdit
             return charmanderOffsets;
         }
 
-        public long[] getRomName ()
+        public long[] getRomName()
         {
             return romName;
         }
