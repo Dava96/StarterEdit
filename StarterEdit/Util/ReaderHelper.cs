@@ -64,6 +64,26 @@ namespace StarterEdit.Util
             }
         }
 
+        public void readBattlePokemon(long[] offsetArray, BinaryReader reader, ComboBox pkm1, ComboBox pkm2, ComboBox pkm3, ComboBox pkm4, ComboBox pkm5, ComboBox pkm6)
+        {
+
+            ComboBox[] pokemon = new ComboBox[] { pkm1, pkm2, pkm3, pkm4, pkm5, pkm6 };
+            int decVal = 0;
+            for (int i = 0; i < offsetArray.Length; i++)
+            {
+                if (offsetArray[i] != 0x0)
+                {
+                    reader.BaseStream.Position = offsetArray[i];
+                    string hexVal = string.Format("{0:X}", reader.ReadByte());
+                    decVal = Convert.ToInt32(hexVal, 16);
+                    pokemon[i].SelectedIndex = decVal;
+                }
+                else if (offsetArray[i] == 0x0)
+                {
+                    pokemon[i].SelectedIndex = -1;
+                }
+            }
+        }
 
     }
 
