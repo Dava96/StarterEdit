@@ -89,5 +89,24 @@ namespace StarterEdit.Util
             }
         }
 
+        public void writePatches(long offset, StreamWriter writer, CheckBox checkBox)
+        {
+
+                if (checkBox.IsChecked == false)
+                {
+                    writer.BaseStream.Position = offset;
+
+                    writer.BaseStream.WriteByte(0xF0);
+                    writer.Flush();
+                }
+                else if (checkBox.IsChecked == true)
+                {
+                writer.BaseStream.Position = offset;
+
+                writer.BaseStream.WriteByte(0xc9);
+                writer.Flush();
+                }
+        }
+
     }
 }
