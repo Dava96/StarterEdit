@@ -134,7 +134,8 @@ namespace StarterEdit
 
                 writeHelper.writeBattleLvls(offsets.FirstBattleLevels, writer, LevelBox, LevelBox2, LevelBox3); // writes the rivals levels for the first battle
                 writeHelper.writeBattlePkm(offsets.FirstBattlePokemon, writer, NameList4.SelectedIndex, NameList5.SelectedIndex, NameList6.SelectedIndex);
-                
+                writeHelper.writePatches(offsets.autoScroll, writer, autoScroll);
+
                 canSave();
 
 
@@ -195,7 +196,6 @@ namespace StarterEdit
             playerChoice2.Content = Starter2.Content.ToString();
             playerChoice3.Content = Starter3.Content.ToString();
         }
-
 
         private void BattleLocations_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

@@ -24,6 +24,9 @@
             <MenuItem x:Name="menuFile" Header="File" Height="16" Width="32">
                 <MenuItem x:Name="menuOpen" Header="Open" Click="menuOpen_Click"/>
                 <MenuItem x:Name="menuSave" Header="Save" Click="menuSave_Click"/>
+                <MenuItem x:Name="patches" Header="Patches">
+                    <CheckBox x:Name="autoScroll" Content="Auto Scroll"/>
+                </MenuItem>
             </MenuItem>
         </Menu>
         <UniformGrid Grid.Row="1" Columns="3" Rows="3">
