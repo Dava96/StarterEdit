@@ -83,6 +83,7 @@ namespace StarterEdit
 
                 StarterEditWindow.Title = "Starter Edit | " + readerHelper.getRomLoaded(reader, romName);
                 readerHelper.readBattleLvls(offsets.FirstBattleLevels, reader, LevelBox, LevelBox2, LevelBox3);
+                autoScroll.IsChecked = readerHelper.readPatches(offsets.autoScroll, reader);
             }
             catch (Exception args)
             {

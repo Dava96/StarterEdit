@@ -64,6 +64,16 @@ namespace StarterEdit.Util
             }
         }
 
+        public bool readPatches(long offset, BinaryReader reader)
+        {
+            reader.BaseStream.Position = offset;
+            if (reader.ReadByte() == 0xF0)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public void readBattlePokemon(long[] offsetArray, BinaryReader reader, ComboBox pkm1, ComboBox pkm2, ComboBox pkm3, ComboBox pkm4, ComboBox pkm5, ComboBox pkm6)
         {
 
