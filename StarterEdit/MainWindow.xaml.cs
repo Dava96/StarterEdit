@@ -20,6 +20,8 @@ namespace StarterEdit
         long[] bulbOffsets;
         long[] charmOffsets;
         long[] romName;
+        long[] fileIdentfier;
+        String[] redIdentfier;
         byte[] currentPokmon = new byte[3];
         BinaryReader reader;
         StreamWriter writer;
@@ -44,11 +46,11 @@ namespace StarterEdit
             NameList6.ItemsSource = pokemonData.getPokemonNames();
 
             BattleLocations.ItemsSource = pokemonData.getBattleLocations(); // gets battle locations
-    
+
+            fileIdentfier = offsets.getFileIdentifier();
+            redIdentfier = offsets.getRedIdenifer();
+
             pkmNames = pokemonData.getPokemonNames();
-            bulbOffsets = offsets.getBulbasuarOffsets();
-            charmOffsets = offsets.getCharmanderOffsets();
-            sqrtlOffsets = offsets.getSquirtleOffsets();
             romName = offsets.getRomName();
 
             BattlePokemon1.ItemsSource = pokemonData.getPokemonNames();
@@ -58,7 +60,6 @@ namespace StarterEdit
             BattlePokemon5.ItemsSource = pokemonData.getPokemonNames();
             BattlePokemon6.ItemsSource = pokemonData.getPokemonNames();
             //offsets.FirstBattleOffsets;
-
         }
 
         private void menuOpen_Click(object sender, RoutedEventArgs e)
@@ -68,6 +69,19 @@ namespace StarterEdit
                 openDialog.Filter = "PKM R/B (*.gb)|*.gb";
                 openDialog.ShowDialog();
                 reader = new BinaryReader(File.Open(openDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.Write));
+
+                if (readerHelper.getRomVersion(reader, fileIdentfier, redIdentfier).Equals("red"))
+                {
+                    bulbOffsets = offsets.getBulbasuarOffsets(); // load red offsets
+                    charmOffsets = offsets.getCharmanderOffsets();
+                    sqrtlOffsets = offsets.getSquirtleOffsets();
+                }
+                else if (readerHelper.getRomVersion(reader, fileIdentfier, redIdentfier).Equals("blue"))
+                {
+                    bulbOffsets = offsets.getBlueBulbasaurOffsets(); // load blue offsets
+                    charmOffsets = offsets.getBlueCharmanderOffsets();
+                    sqrtlOffsets = offsets.getBlueSquirtleOffsets();
+                }
 
                 readStarterPokemon(sqrtlOffsets, reader, Starter1, NameList, 0);
                 readStarterPokemon(bulbOffsets, reader, Starter2, NameList2, 1);
@@ -80,8 +94,8 @@ namespace StarterEdit
                 playerChoice.IsEnabled = true;
                 playerChoice2.IsEnabled = true;
                 playerChoice3.IsEnabled = true;
-
-                StarterEditWindow.Title = "Starter Edit | " + readerHelper.getRomLoaded(reader, romName);
+                
+                StarterEditWindow.Title = "Starter Edit | " + readerHelper.getNameOfRomLoaded(reader, romName);
                 readerHelper.readBattleLvls(offsets.FirstBattleLevels, reader, LevelBox, LevelBox2, LevelBox3);
                 autoScroll.IsChecked = readerHelper.readPatches(offsets.autoScroll, reader);
             }
