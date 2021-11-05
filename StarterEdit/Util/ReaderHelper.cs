@@ -15,7 +15,7 @@ namespace StarterEdit.Util
 
         }
 
-        public string getRomLoaded(BinaryReader reader, long[] romName)
+        public string getNameOfRomLoaded(BinaryReader reader, long[] romName)
         {
             string rName = "";
             char[] name = new char[17];
@@ -29,6 +29,31 @@ namespace StarterEdit.Util
                 rName = string.Concat(name);
             }
             return rName.Trim();
+        }
+
+        public String getRomVersion(BinaryReader reader, long[] fileIdentifer, String[] redIdentfier)
+        {
+            bool red = false;
+
+            for (int i = 0; i < fileIdentifer.Length; i++)
+            {
+                reader.BaseStream.Position = fileIdentifer[i];
+                string hexVal = string.Format("{0:X}", reader.ReadByte());
+
+                if (hexVal.Equals(redIdentfier[i]))
+                {
+                   red = true;
+                }
+            }
+
+            if (red)
+            {
+                return "red";
+            } 
+            else
+            {
+                return "blue";
+            }
         }
 
         public void readBattleLvls(long[] levelArray, BinaryReader reader, TextBox box1, TextBox box2, TextBox box3, TextBox box4, TextBox box5, TextBox box6)
