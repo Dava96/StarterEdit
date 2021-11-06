@@ -34,9 +34,11 @@
             <Label x:Name="Starter2" Content="Bulbasaur" ToolTip="Starter Two"/>
             <Label x:Name="Starter3" Content="Charmander" ToolTip="Starter Three"/>
 
-            <ComboBox x:Name="NameList" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
+            <ComboBox x:Name="NameList" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True"  ToolTip="List of Pokemon names"/>
             <ComboBox x:Name="NameList2" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
             <ComboBox x:Name="NameList3" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
+            <Label x:Name="Pikachu_Label" Content="Pikachu's Level" ToolTip="Starter One" Visibility="Hidden"/>
+            <TextBox x:Name="Pikachu_LevelBox" Text="0" ToolTip="Sets Pikachu's level" MaxLength="3" PreviewTextInput="PreviewTextInput" Visibility="Hidden" />
         </UniformGrid>
 
         <Separator Grid.Row="2" Visibility="Hidden"></Separator>
@@ -69,9 +71,11 @@
         <UniformGrid Grid.Row="5" Columns="3" Rows="3">
         <ComboBox x:Name="BattleLocations" SelectedIndex="0" ToolTip="Battle locations" SelectionChanged="BattleLocations_SelectionChanged"/>
         <Label Content="Players Starter Choice" VerticalAlignment="Center" ToolTip="Players potential starter Pokemon and Battles based on that choice" HorizontalAlignment="Center" />
-            <Label/>
+            <Label>
+                <RadioButton x:Name="playerChoice_Pikachu" Content="Pikachu" ToolTip="Players Starter Pokemon" VerticalAlignment="Top" HorizontalAlignment="Left" IsChecked="False" Checked="playerChoice_Checked_Pikachu" IsEnabled="False" Visibility="Hidden"/>
+            </Label>
 
-        <RadioButton x:Name="playerChoice" Content="Squirtle" ToolTip="Players Starter Pokemon" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="playerChoice_Checked" IsEnabled="False"/>
+            <RadioButton x:Name="playerChoice" Content="Squirtle" ToolTip="Players Starter Pokemon" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="playerChoice_Checked" IsEnabled="False"/>
         <RadioButton x:Name="playerChoice2" Content="Bulbasaur" ToolTip="Players Starter Pokemon" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="False" Checked="playerChoice2_Checked" IsEnabled="False"/>
         <RadioButton x:Name="playerChoice3" Content="Charmander" ToolTip="Players Starter Pokemon" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="False" Checked="playerChoice3_Checked" IsEnabled="False"/>
 
