@@ -67,6 +67,7 @@ namespace StarterEdit
             try
             {
                 openDialog.Filter = "PKM R/B (*.gb)|*.gb";
+         
                 openDialog.ShowDialog();
                 reader = new BinaryReader(File.Open(openDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.Write));
 
