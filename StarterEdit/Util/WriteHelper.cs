@@ -9,7 +9,6 @@ namespace StarterEdit.Util
 
     class WriteHelper
     {
-        StreamWriter writer;
         byte[] currentPokmon = new byte[3];
 
         public WriteHelper()

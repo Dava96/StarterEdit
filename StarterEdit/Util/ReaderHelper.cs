@@ -8,7 +8,6 @@ namespace StarterEdit.Util
 {
     class ReaderHelper
     {
-        BinaryReader reader;
 
         public ReaderHelper()
         {
