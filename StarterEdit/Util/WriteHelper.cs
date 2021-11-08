@@ -42,6 +42,18 @@ namespace StarterEdit.Util
             }
         }
 
+        public void writeBattlePkm(long[] offsetArray, StreamWriter writer, int pkm1) // Pokemon 1,2 and 3 values from nameList
+        {
+            // Overload for Pokemon Yellow
+            int[] pokemonArray = new int[] { pkm1 }; 
+            for (int i = 0; i < offsetArray.Length; i++)
+            {
+                writer.BaseStream.Position = offsetArray[i];
+                writer.BaseStream.WriteByte((byte)pokemonArray[i]);
+                writer.Flush();
+            }
+        }
+
 
         public void writeBattlePkm(long[] offsetArray, StreamWriter writer, int pkm1, int pkm2, int pkm3, int pkm4, int pkm5, int pkm6) // Pokemon 1,2 and 3 values from nameList
         {
@@ -72,6 +84,23 @@ namespace StarterEdit.Util
                 }
             }
         }
+
+        public void writeBattleLvls(long[] offsetArray, StreamWriter writer, TextBox levelBox)
+        {
+            {
+                // Overload for pokemon yellow
+                TextBox[] levelBoxes = new TextBox[] { levelBox};
+                for (int i = 0; i < offsetArray.Length; i++)
+                {
+                    writer.BaseStream.Position = offsetArray[i];
+
+                    writer.BaseStream.WriteByte((byte)Int32.Parse(levelBoxes[i].Text.ToString()));
+                    writer.Flush();
+                }
+            }
+        }
+
+
 
         public void writeBattleLvls(long[] offsetArray, StreamWriter writer, TextBox levelBox, TextBox levelBox2, TextBox levelBox3, TextBox levelBox4, TextBox levelBox5, TextBox levelBox6)
         {
