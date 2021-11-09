@@ -73,7 +73,7 @@
         <Label Content="Players Starter Choice" VerticalAlignment="Center" ToolTip="Players potential starter Pokemon and Battles based on that choice" HorizontalAlignment="Center" />
             <Label>
                 
-                <CheckBox x:Name="playerChoice_Pikachu" Content="Pikachu" ToolTip="This is enabled when pokemon yellow is open" VerticalAlignment="Top" HorizontalAlignment="Left" IsChecked="False" Checked="playerChoice_Checked_Pikachu" IsEnabled="False" Visibility="Hidden"/>
+                <RadioButton x:Name="playerChoice_Pikachu" Content="Pikachu" ToolTip="This is enabled when pokemon yellow is open" VerticalAlignment="Top" HorizontalAlignment="Left" IsChecked="False" Checked="playerChoice_Checked_Pikachu" IsEnabled="False" Visibility="Hidden"/>
             </Label>
 
             <RadioButton x:Name="playerChoice" Content="Squirtle" ToolTip="Players Starter Pokemon" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="playerChoice_Checked" IsEnabled="False"/>
