@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace StarterEdit.Util
@@ -107,7 +108,7 @@ namespace StarterEdit.Util
 
             for (int i = 0; i < offsetArray.Length; i++)
             {
-                if (!levelBoxes[i].Text.Equals("0"))
+                if (!levelBoxes[i].Text.Equals("0") && offsetArray[i] != 0)
                 {
                     writer.BaseStream.Position = offsetArray[i];
 
@@ -134,6 +135,35 @@ namespace StarterEdit.Util
                 writer.BaseStream.WriteByte(0xc9);
                 writer.Flush();
                 }
+        }
+
+        public Boolean checkInputs(TextBox levelBox, TextBox levelBox2, TextBox levelBox3, TextBox levelBox4, TextBox levelBox5, TextBox levelBox6, TextBox levelBox7, TextBox levelBox8, TextBox levelBox9, TextBox levelBox10)
+        {
+            try
+            {
+                // checks if the inputs are under 0 or over 255
+                int maxNumber = 254;
+                TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3, levelBox4, levelBox5, levelBox6, levelBox7, levelBox8, levelBox9, levelBox10 };
+                for (int i = 0; i < levelBoxes.Length; i++)
+                {
+                    int number = Convert.ToInt32(levelBoxes[i].Text);
+                    if (number > maxNumber)
+                    {
+                        levelBoxes[i].Text = maxNumber.ToString();
+                    } else if (number < 0)
+                    {
+                        levelBoxes[i].Text = "0";
+                    }
+                    number = 0;
+                }
+                return true;
+            }
+            catch (System.FormatException args)
+            {
+                MessageBox.Show("Please Enter a number, i.e 25", "Invalid Input", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Console.WriteLine(args);
+                return false;
+            }
         }
 
     }
