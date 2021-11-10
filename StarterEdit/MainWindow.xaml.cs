@@ -11,7 +11,6 @@ namespace StarterEdit
     public partial class MainWindow : Window
     {
         public readonly Regex numbersOnly = new Regex("[^0-9.-]+"); // Used force text input on the text boxes
-        int maxNumber = 254;
         PokemonData pokemonData = new PokemonData();
         Offsets offsets = new Offsets();
         static OpenFileDialog openDialog = new OpenFileDialog();
@@ -127,48 +126,42 @@ namespace StarterEdit
             try
             {
                 writer = new StreamWriter(File.Open(openDialog.FileName, FileMode.Open, FileAccess.Write, FileShare.Read));
-                if (isYellow)
+
+                if (writeHelper.checkInputs(LevelBox, LevelBox2, LevelBox3, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6, Pikachu_LevelBox)) // If inputs aren't valid correct them
                 {
-                    writeHelper.writeStarterPokemon(pokemonYellowOffsets.yellowFirstBattle, writer, NameList2.SelectedIndex, 1); // Writes the users first pokemon
-                } else
-                {
-                    writeHelper.writeStarterPokemon(sqrtlOffsets, writer, NameList.SelectedIndex, 0);
-                    writeHelper.writeStarterPokemon(bulbOffsets, writer, NameList2.SelectedIndex, 1);
-                    writeHelper.writeStarterPokemon(charmOffsets, writer, NameList3.SelectedIndex, 2);
+                    if (isYellow)
+                    {
+                        writeHelper.writeStarterPokemon(pokemonYellowOffsets.yellowFirstBattle, writer, NameList2.SelectedIndex, 1); // Writes the users first pokemon
+                        writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowFirstBattleUserLvl, writer, Pikachu_LevelBox); // writes the users first level
+                        writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowFirstBattleRivalLvl, writer, LevelBox2); // writes the rivals levels for the first battle
+
+                        writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowFirstBattleRival, writer, NameList5.SelectedIndex);
+
+                        canSaveYellow(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
+                            BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
+                    }
+                    else // Red and Blue
+                    {
+                        writeHelper.writeStarterPokemon(sqrtlOffsets, writer, NameList.SelectedIndex, 0);
+                        writeHelper.writeStarterPokemon(bulbOffsets, writer, NameList2.SelectedIndex, 1);
+                        writeHelper.writeStarterPokemon(charmOffsets, writer, NameList3.SelectedIndex, 2);
+
+                        writeHelper.writeBattleLvls(offsets.FirstBattleLevels, writer, LevelBox, LevelBox2, LevelBox3); // writes the rivals levels for the first battle
+                        writeHelper.writeBattlePkm(offsets.FirstBattlePokemon, writer, NameList4.SelectedIndex, NameList5.SelectedIndex, NameList6.SelectedIndex);
+                        writeHelper.writePatches(offsets.autoScroll, writer, autoScroll);
+
+                        canSaveChoiceSquirtle(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
+                            BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
+
+                        canSaveChoiceBulbasaur(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
+                            BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
+
+                        canSaveChoiceCharmander(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
+                            BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
+                    }
+                    MessageBox.Show("Changes saved succesfully", "Changes saved");
                 }
 
-                isNumbersUnder(LevelBox, LevelBox2, LevelBox3); // if the number inputted is > 254 it will be set to 254 as that's the max number the games can handle, otherwise it glitches out
-
-                isNumbersUnder(BattleLvl, BattleLvl2, BattleLvl3); // checks if the battle pokemons levels are under 254
-                isNumbersUnder(BattleLvl4, BattleLvl5, BattleLvl6);
-
-                if (isYellow)
-                {
-                    writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowFirstBattleUserLvl, writer, Pikachu_LevelBox); // writes the users first level
-                    writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowFirstBattleRivalLvl, writer, LevelBox2); // writes the rivals levels for the first battle
-
-                    writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowFirstBattleRival, writer, NameList5.SelectedIndex);
-
-                    canSaveYellow(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
-                        BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
-                } 
-                else
-                {
-                    writeHelper.writeBattleLvls(offsets.FirstBattleLevels, writer, LevelBox, LevelBox2, LevelBox3); // writes the rivals levels for the first battle
-                    writeHelper.writeBattlePkm(offsets.FirstBattlePokemon, writer, NameList4.SelectedIndex, NameList5.SelectedIndex, NameList6.SelectedIndex);
-                    writeHelper.writePatches(offsets.autoScroll, writer, autoScroll);
-
-                    canSaveChoiceSquirtle(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
-                        BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
-
-                    canSaveChoiceBulbasaur(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
-                        BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
-
-                    canSaveChoiceCharmander(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
-                        BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
-                }
-
-                MessageBox.Show("Changes saved succesfully", "Changes saved");
                 writer.Close();
             }
             catch (ArgumentException args)
@@ -227,26 +220,6 @@ namespace StarterEdit
                 playerChoice_Pikachu.Visibility = Visibility.Visible;
                 playerChoice_Pikachu.IsChecked = true;
                 hideRadioButtons();
-            }
-        }
-        public void isNumbersUnder(TextBox levelBox, TextBox levelBox2, TextBox levelBox3)
-        {
-            try
-            {
-                TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
-                for (int i = 0; i < levelBoxes.Length; i++)
-                {
-                    int number = Convert.ToInt32(levelBoxes[i].Text);
-                    if (number > maxNumber)
-                    {
-                        levelBoxes[i].Text = maxNumber.ToString();
-                    }
-                    number = 0;
-                }
-            }
-            catch (System.FormatException args)
-            {
-                MessageBox.Show("Please Enter a number, i.e 25", "Invalid Input", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
         
