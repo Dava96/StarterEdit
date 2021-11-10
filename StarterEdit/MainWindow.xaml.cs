@@ -79,17 +79,11 @@ namespace StarterEdit
 
                 if (readerHelper.getRomVersion(reader, fileIdentfier).Equals("red"))
                 {
-                    bulbOffsets = offsets.getBulbasuarOffsets(); // load red offsets
-                    charmOffsets = offsets.getCharmanderOffsets();
-                    sqrtlOffsets = offsets.getSquirtleOffsets();
-                    setupForRedAndBlue();
+                    setupForRed();
                 }
                 else if (readerHelper.getRomVersion(reader, fileIdentfier).Equals("blue"))
                 {
-                    bulbOffsets = offsets.getBlueBulbasaurOffsets(); // load blue offsets
-                    charmOffsets = offsets.getBlueCharmanderOffsets();
-                    sqrtlOffsets = offsets.getBlueSquirtleOffsets();
-                    setupForRedAndBlue();
+                    setupForBlue();
 
                 } else if (readerHelper.getRomVersion(reader, fileIdentfier).Equals("yellow"))
                 {
@@ -98,14 +92,10 @@ namespace StarterEdit
                 }
                 else if (readerHelper.getRomVersion(reader, fileIdentfier).Equals("green"))
                 {
-                    bulbOffsets = offsets.greenBulbasuarOffsets;
-                    charmOffsets = offsets.greenCharmanderOffsets;
-                    sqrtlOffsets = offsets.greenSquirtleOffsets;
                     isGreen = true;
                     setupForGreen();
                 }
-
-                StarterEditWindow.Title = "Starter Edit | " + readerHelper.getNameOfRomLoaded(reader, romName); // Sets rom name as title
+                UiLoad();
             }
             catch (Exception args)
             {
@@ -128,7 +118,7 @@ namespace StarterEdit
             for (int i = 0; i < offsetArray.Length; i++)
             {
                 reader.BaseStream.Position = offsetArray[i];
-                string hexVal = string.Format("{0:X}",  reader.ReadByte());
+                string hexVal = string.Format("{0:X}", reader.ReadByte());
                 decVal = Convert.ToInt32(hexVal, 16);
             }
             Starter.Content = pkmNames[decVal];
@@ -156,7 +146,7 @@ namespace StarterEdit
                         canSaveYellow(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
                             BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
                     }
-                    else if (isGreen)
+                    else
                     {
                         writeHelper.writeStarterPokemon(sqrtlOffsets, writer, NameList.SelectedIndex, 0);
                         writeHelper.writeStarterPokemon(bulbOffsets, writer, NameList2.SelectedIndex, 1);
@@ -165,25 +155,6 @@ namespace StarterEdit
                         writeHelper.writeBattleLvls(firstBattleLevels, writer, LevelBox, LevelBox2, LevelBox3); // writes the rivals levels for the first battle
                         writeHelper.writeBattlePkm(firstBattlePokemon, writer, NameList4.SelectedIndex, NameList5.SelectedIndex, NameList6.SelectedIndex);
                         writeHelper.writePatches(autoScrollLocation, writer, autoScroll);
-
-                        canSaveChoiceSquirtle(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
-                            BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
-
-                        canSaveChoiceBulbasaur(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
-                            BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
-
-                        canSaveChoiceCharmander(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
-                            BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
-                    }
-                    else // Red and Blue
-                    {
-                        writeHelper.writeStarterPokemon(sqrtlOffsets, writer, NameList.SelectedIndex, 0);
-                        writeHelper.writeStarterPokemon(bulbOffsets, writer, NameList2.SelectedIndex, 1);
-                        writeHelper.writeStarterPokemon(charmOffsets, writer, NameList3.SelectedIndex, 2);
-
-                        writeHelper.writeBattleLvls(offsets.FirstBattleLevels, writer, LevelBox, LevelBox2, LevelBox3); // writes the rivals levels for the first battle
-                        writeHelper.writeBattlePkm(offsets.FirstBattlePokemon, writer, NameList4.SelectedIndex, NameList5.SelectedIndex, NameList6.SelectedIndex);
-                        writeHelper.writePatches(offsets.autoScroll, writer, autoScroll);
 
                         canSaveChoiceSquirtle(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
                             BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
@@ -213,43 +184,72 @@ namespace StarterEdit
 
         }
 
-        public void setupForRedAndBlue()
+        public void setupForRed()
         {
-            
-            readStarterPokemon(sqrtlOffsets, reader, Starter1, NameList, 0);
-            readStarterPokemon(bulbOffsets, reader, Starter2, NameList2, 1);
-            readStarterPokemon(charmOffsets, reader, Starter3, NameList3, 2);
+            bulbOffsets = offsets.getBulbasuarOffsets(); // load blue offsets
+            charmOffsets = offsets.getCharmanderOffsets();
+            sqrtlOffsets = offsets.getSquirtleOffsets();
 
-            readStarterPokemon(offsets.rivalsChoice1, reader, RivalStarter, NameList4, 0);
-            readStarterPokemon(offsets.rivalsChoice2, reader, RivalStarter2, NameList5, 1);
-            readStarterPokemon(offsets.rivalsChoice3, reader, RivalStarter3, NameList6, 2);
+            firstBattleLevels = offsets.FirstBattleLevels;
+            firstBattlePokemon = offsets.FirstBattlePokemon;
+            rivalChoiceSquirtle = offsets.rivalsChoice1; // bulb
+            rivalChoiceBulbasaur = offsets.rivalsChoice2; // charmander
+            rivalChoiceCharmander = offsets.rivalsChoice3; // squirtle
+            autoScrollLocation = offsets.autoScroll;
 
             playerChoice.IsEnabled = true;
             playerChoice2.IsEnabled = true;
             playerChoice3.IsEnabled = true;
             playerChoice.IsChecked = true;
+        }
 
-            readerHelper.readBattleLvls(offsets.FirstBattleLevels, reader, LevelBox, LevelBox2, LevelBox3);
-            autoScroll.IsChecked = readerHelper.readPatches(offsets.autoScroll, reader);
+        public void setupForBlue()
+        {
+            bulbOffsets = offsets.getBlueBulbasaurOffsets(); // load blue offsets
+            charmOffsets = offsets.getBlueCharmanderOffsets();
+            sqrtlOffsets = offsets.getBlueSquirtleOffsets();
+
+            firstBattleLevels = offsets.FirstBattleLevels;
+            firstBattlePokemon = offsets.FirstBattlePokemon;
+            rivalChoiceSquirtle = offsets.rivalsChoice1 ; // bulb
+            rivalChoiceBulbasaur = offsets.rivalsChoice2; // charmander
+            rivalChoiceCharmander = offsets.rivalsChoice3; // squirtle
+            autoScrollLocation = offsets.autoScroll;
+
+            playerChoice.IsEnabled = true;
+            playerChoice2.IsEnabled = true;
+            playerChoice3.IsEnabled = true;
+            playerChoice.IsChecked = true;
         }
 
         public void setupForGreen()
         {
+            bulbOffsets = offsets.greenBulbasuarOffsets;
+            charmOffsets = offsets.greenCharmanderOffsets;
+            sqrtlOffsets = offsets.greenSquirtleOffsets;
 
             playersChoiceSquirtle.setOffsetsIfGreen(isGreen);
             playersChoiceBulbasaur.setOffsetsIfGreen(isGreen);
             playersChoiceCharmander.setOffsetsIfGreen(isGreen);
 
+            firstBattleLevels = offsets.greenFirstBattleLevels;
+            firstBattlePokemon = offsets.greenFirstBattlePokemon;
+            rivalChoiceSquirtle = offsets.greenRivalsChoice1; // bulb
+            rivalChoiceBulbasaur = offsets.greenRivalsChoice2; // charmander
+            rivalChoiceCharmander = offsets.greenRivalsChoice3; // squirtle
+            autoScrollLocation = offsets.greenAutoScroll;
+
+            playerChoice.IsEnabled = true;
+            playerChoice2.IsEnabled = true;
+            playerChoice3.IsEnabled = true;
+            playerChoice.IsChecked = true;
+        }
+
+        public void UiLoad()
+        {
             readStarterPokemon(sqrtlOffsets, reader, Starter1, NameList, 0);
             readStarterPokemon(bulbOffsets, reader, Starter2, NameList2, 1);
             readStarterPokemon(charmOffsets, reader, Starter3, NameList3, 2);
-
-            firstBattleLevels = offsets.greenFirstBattleLevels;
-            firstBattlePokemon = offsets.greenFirstBattlePokemon;
-            rivalChoiceSquirtle = offsets.greenSquirtleOffsets;
-            rivalChoiceBulbasaur = offsets.greenBulbasuarOffsets;
-            rivalChoiceCharmander = offsets.greenCharmanderOffsets;
-            autoScrollLocation = offsets.greenAutoScroll;
 
             readStarterPokemon(rivalChoiceSquirtle, reader, RivalStarter, NameList4, 0);
             readStarterPokemon(rivalChoiceBulbasaur, reader, RivalStarter2, NameList5, 1);
@@ -262,30 +262,32 @@ namespace StarterEdit
 
             readerHelper.readBattleLvls(firstBattleLevels, reader, LevelBox, LevelBox2, LevelBox3);
             autoScroll.IsChecked = readerHelper.readPatches(autoScrollLocation, reader);
+            StarterEditWindow.Title = "Starter Edit | " + readerHelper.getNameOfRomLoaded(reader, romName); // Sets rom name as title
         }
 
         public void setupForYellow()
         {
             if (isYellow)
             {
+                playerChoice_Pikachu.IsChecked = true;
+                Pikachu_Label.Visibility = Visibility.Visible;
+                Pikachu_LevelBox.Visibility = Visibility.Visible;
+                readStarterPokemon(pokemonYellowOffsets.yellowFirstBattle, reader, Starter2, NameList2, 1);
+                readerHelper.readBattleLvls(pokemonYellowOffsets.yellowFirstBattleUserLvl, reader, Pikachu_LevelBox);
+                readStarterPokemon(pokemonYellowOffsets.yellowFirstBattleRival, reader, RivalStarter2, NameList5, 1);
+                readerHelper.readBattleLvls(pokemonYellowOffsets.yellowFirstBattleRivalLvl, reader, LevelBox2);
+
+                patches.Visibility = Visibility.Hidden;
+
+                playerChoice_Pikachu.Visibility = Visibility.Visible;
+         
                 NameList.IsEnabled = false;
                 NameList3.IsEnabled = false;
                 NameList4.IsEnabled = false;
                 NameList6.IsEnabled = false;
                 LevelBox.IsEnabled = false;
                 LevelBox3.IsEnabled = false;
-
-                Pikachu_Label.Visibility = Visibility.Visible;
-                Pikachu_LevelBox.Visibility = Visibility.Visible;
-                readerHelper.readBattleLvls(pokemonYellowOffsets.yellowFirstBattleUserLvl, reader, Pikachu_LevelBox);
-                readStarterPokemon(pokemonYellowOffsets.yellowFirstBattleRival, reader, RivalStarter2, NameList5, 1);
-                readerHelper.readBattleLvls(pokemonYellowOffsets.yellowFirstBattleRivalLvl, reader, LevelBox2);
-
-                readStarterPokemon(pokemonYellowOffsets.yellowFirstBattle, reader, Starter2, NameList2, 1);
-                patches.Visibility = Visibility.Hidden;
-
-                playerChoice_Pikachu.Visibility = Visibility.Visible;
-                playerChoice_Pikachu.IsChecked = true;
+                StarterEditWindow.Title = "Starter Edit | " + readerHelper.getNameOfRomLoaded(reader, romName); // Sets rom name as title
                 hideRadioButtons();
             }
         }
