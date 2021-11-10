@@ -31,9 +31,9 @@ namespace StarterEdit
         public long[] rivalsChoice2 = new long[] { 0x3A1EB }; // rivals choice if you pick charmander, normally squirtle
         public long[] rivalsChoice3 = new long[] { 0x3A1E5 }; // rivals choice if you pick bulbasuar, normally charmander
 
-        public long[] greenRivalsChoice1 = new long[] { 0x3A556 }; // rivals choice if you pick Squirtle, normally bulbasuar
-        public long[] greenRivalsChoice2 = new long[] { 0x3A559 }; // rivals choice if you pick charmander, normally squirtle
-        public long[] greenRivalsChoice3 = new long[] { 0x3A55C }; // rivals choice if you pick bulbasuar, normally charmander
+        public long[] greenRivalsChoice1 = new long[] { 0x3A559 }; // rivals choice if you pick Squirtle, normally bulbasuar
+        public long[] greenRivalsChoice2 = new long[] { 0x3A55C }; // rivals choice if you pick charmander, normally squirtle
+        public long[] greenRivalsChoice3 = new long[] { 0x3A556 }; // rivals choice if you pick bulbasuar, normally charmander
 
         public long[] greenFirstBattleLevels = new long[] { 0x3A555, 0x3A558, 0x3A55B };
         public long[] greenFirstBattlePokemon = new long[] { 0x3A556, 0x3A559, 0x3A55C };
