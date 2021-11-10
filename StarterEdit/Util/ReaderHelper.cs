@@ -36,6 +36,7 @@ namespace StarterEdit.Util
             String blueIdentfier = "D39DA";
             String redIdentfier = "2091E6";
             String yellowIdentfier = "9747C";
+            String greenIdentfier = "9CDDD5";
 
             for (int i = 0; i < fileIdentifer.Length; i++)
             {
@@ -50,9 +51,12 @@ namespace StarterEdit.Util
             else if (hexVal.Equals(blueIdentfier))
             {
                 return "blue";
-            } else
+            } else if (hexVal.Equals(yellowIdentfier))
             {
                 return "yellow";
+            } else
+            {
+                return "green";
             }
       
         }
