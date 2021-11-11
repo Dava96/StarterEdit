@@ -1,14 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
+using System.Windows;
 
 namespace StarterEdit
 {
     class PokemonData
     {
-
         public int[] pokemonDecimals;
         public string[] pokemonHexValues;
         public string[] pokemonNames;
@@ -16,13 +14,17 @@ namespace StarterEdit
         public string[] battleLocations = new string[] { "Route 22 (1)", "Cerulean City", "S.S Anne", "Pokemon Tower", "Silph Co.", "Route 22 (2)", "Indigo Plateau"};
         private StreamReader readNames;
 
-        // to do make a seperate window for the trainer editor
-        // to do make a stat editor for each individual pokemon
-        // to do implement the title screen editor
         public PokemonData()
         {
-            readNames = new StreamReader(setDirectory() + @".\PokemonNames.txt");
-
+            try
+            {
+                readNames = new StreamReader(setDirectory() + @".\PokemonNames.data");
+            } catch (FileNotFoundException)
+            {
+                MessageBox.Show("Can't find the PokemonNames.data file, please put it in the applications directory: " + setDirectory(), "FileNotFoundException", MessageBoxButton.OK, MessageBoxImage.Error);
+                Environment.Exit(1);
+            }
+            
             pokemonDecimals = new int[256];
             pokemonHexValues = new string[256];
             pokemonNames = new string[256];
@@ -31,12 +33,18 @@ namespace StarterEdit
             populateArray(pokemonDecimals);
             populateArray(pokemonNames, readNames);
             populateArray(pokemonHexValues, pokemonDecimals);
-            readNames = new StreamReader(setDirectory() + @".\PokemonNamesPokedexOrder.txt");
+
+            try
+            {
+                readNames = new StreamReader(setDirectory() + @".\PokemonNamesPokedexOrder.data");
+            } catch(FileNotFoundException)
+            {
+                MessageBox.Show("Can't find the PokemonNamesPokeDexOrder.data file, please put it in the applications directory: " + setDirectory(), "FileNotFoundException", MessageBoxButton.OK, MessageBoxImage.Error);
+                Environment.Exit(1);
+            }
 
             populateArray(pokedexOrderedNames, readNames);
             //Console.WriteLine(pokedexOrderedNames[153]); // this is in preperation of pokemon stat editing capabilites as pokemon names are stored in dex order there
-
-
         }
 
         public int[] populateArray(int[] pokemonDecimals)
