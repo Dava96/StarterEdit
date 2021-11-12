@@ -27,6 +27,8 @@
                 <MenuItem x:Name="patches" Header="Patches">
                     <CheckBox x:Name="autoScroll" Content="Auto Scroll"/>
                 </MenuItem>
+                <MenuItem x:Name="help" Header="Help" Click="menuHelp_Click"/>
+                
             </MenuItem>
         </Menu>
         <UniformGrid Grid.Row="1" Columns="3" Rows="3">

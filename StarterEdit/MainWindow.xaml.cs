@@ -1014,5 +1014,36 @@ namespace StarterEdit
                 }
             }
         }
-    }    
+
+        private void menuHelp_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxButton messageOptions = MessageBoxButton.YesNo;
+            string messageText = "A tool to edit the starter Pokemon and Rival battles in Pokemon Red, Blue, Yellow and Green.\n" +
+                "The Auto Scroll patch makes the text boxes in the game keep scrolling rather than relying on user input.\n" +
+                "Do you have a issue with the program?";
+            var result = MessageBox.Show(messageText, "Help", messageOptions, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = "https://github.com/Dava96/StarterEdit/issues",
+                        UseShellExecute = true
+                    });
+                }
+                catch (System.ComponentModel.Win32Exception noBrowser)
+                {
+                    if (noBrowser.ErrorCode == -2147467259)
+                        MessageBox.Show(noBrowser.Message);
+                }
+                catch (System.Exception other)
+                {
+                    MessageBox.Show(other.Message);
+                }
+            }
+        }
+
+    }
+
 }
