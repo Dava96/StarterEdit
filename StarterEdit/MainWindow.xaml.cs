@@ -509,50 +509,14 @@ namespace StarterEdit
 
         private void playerChoice_Checked(object sender, RoutedEventArgs e) // squirtle radio button
         {
-            long a = squirtle.getBattle(BattleName.Route22_1)[DataType.Pokemon][0];
-            var b = getPokemonBoxes()[0].SelectedIndex;
-            // var aa = a["Pokemon"][0];
-            MessageBox.Show($"{b}");
-
-
             int battleSelected = BattleLocations.SelectedIndex;
 
-            // IPlayersChoice pokemonChoice = getPokemonChoice();
+            IPlayersChoice pokemonChoice = getPokemonChoice();
 
-            if (squirtle != null)
+            if (pokemonChoice != null)
             {
                 BattleName selectedBattle = (BattleName)battleSelected;
-                Dictionary<DataType, long[]> battleData = squirtle.getBattle(selectedBattle);
-
-                readerHelper.readBattleLvls(battleData[DataType.Level], reader, getBattleBoxes());
-                readerHelper.readBattlePokemon(battleData[DataType.Pokemon], reader, getPokemonBoxes());
-            }
-        }
-
-        private void playerChoice2_Checked(object sender, RoutedEventArgs e) // bulbasaur radio button
-        {
-            // int battleSelected = BattleLocations.SelectedIndex;
-
-            int battleSelected = BattleLocations.SelectedIndex;
-
-            if (bulbasaur != null)
-            {
-                BattleName selectedBattle = (BattleName)battleSelected;
-                Dictionary<DataType, long[]> battleData = bulbasaur.getBattle(selectedBattle);
-
-                readerHelper.readBattleLvls(battleData[DataType.Level], reader, getBattleBoxes());
-                readerHelper.readBattlePokemon(battleData[DataType.Pokemon], reader, getPokemonBoxes());
-            }
-        }
-
-        private void playerChoice3_Checked(object sender, RoutedEventArgs e) // charmander radio button 
-        {
-            int battleSelected = BattleLocations.SelectedIndex;
-
-            if (charmander != null)
-            {
-                BattleName selectedBattle = (BattleName)battleSelected;
-                Dictionary<DataType, long[]> battleData = charmander.getBattle(selectedBattle);
+                Dictionary<DataType, long[]> battleData = pokemonChoice.getBattle(selectedBattle);
 
                 readerHelper.readBattleLvls(battleData[DataType.Level], reader, getBattleBoxes());
                 readerHelper.readBattlePokemon(battleData[DataType.Pokemon], reader, getPokemonBoxes());
