@@ -55,9 +55,8 @@ namespace StarterEdit.Util
         }
 
 
-        public void writeBattlePkm(long[] offsetArray, StreamWriter writer, int pkm1, int pkm2, int pkm3, int pkm4, int pkm5, int pkm6) // Pokemon 1,2 and 3 values from nameList
+        public void writeBattlePkm(long[] offsetArray, StreamWriter writer, int[] pokemonArray) // Pokemon 1,2 and 3 values from nameList
         {
-            int[] pokemonArray = new int[] { pkm1, pkm2, pkm3, pkm4, pkm5, pkm6 }; // the game might default to bulbasurs position if this is changed
             for (int i = 0; i < offsetArray.Length; i++)
             {
                 if (pokemonArray[i] >= 0)
@@ -70,20 +69,20 @@ namespace StarterEdit.Util
         }
 
 
-        public void writeBattleLvls(long[] offsetArray, StreamWriter writer, TextBox levelBox, TextBox levelBox2, TextBox levelBox3)
-        {
-            {
+        // public void writeBattleLvls(long[] offsetArray, StreamWriter writer, TextBox[] levelBoxes)
+        // {
+        //     {
 
-                TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
-                for (int i = 0; i < offsetArray.Length; i++)
-                {
-                    writer.BaseStream.Position = offsetArray[i];
+        //         TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
+        //         for (int i = 0; i < offsetArray.Length; i++)
+        //         {
+        //             writer.BaseStream.Position = offsetArray[i];
 
-                    writer.BaseStream.WriteByte((byte)Int32.Parse(levelBoxes[i].Text.ToString()));
-                    writer.Flush();
-                }
-            }
-        }
+        //             writer.BaseStream.WriteByte((byte)Int32.Parse(levelBoxes[i].Text.ToString()));
+        //             writer.Flush();
+        //         }
+        //     }
+        // }
 
         public void writeBattleLvls(long[] offsetArray, StreamWriter writer, TextBox levelBox)
         {
@@ -102,9 +101,8 @@ namespace StarterEdit.Util
 
 
 
-        public void writeBattleLvls(long[] offsetArray, StreamWriter writer, TextBox levelBox, TextBox levelBox2, TextBox levelBox3, TextBox levelBox4, TextBox levelBox5, TextBox levelBox6)
+        public void writeBattleLvls(long[] offsetArray, StreamWriter writer, TextBox[] levelBoxes)
         {
-            TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3, levelBox4, levelBox5, levelBox6 };
 
             for (int i = 0; i < offsetArray.Length; i++)
             {
