@@ -165,11 +165,7 @@ namespace StarterEdit
                         writeHelper.writeBattlePkm(firstBattlePokemon, writer, NameList4.SelectedIndex, NameList5.SelectedIndex, NameList6.SelectedIndex);
                         writeHelper.writePatches(autoScrollLocation, writer, autoScroll);
 
-                        canSaveChoiceSquirtle(BattleLocations.SelectedIndex, pokemonArray);
-
-                        canSaveChoiceBulbasaur(BattleLocations.SelectedIndex, pokemonArray);
-
-                        canSaveChoiceCharmander(BattleLocations.SelectedIndex, pokemonArray);
+                        canSave(BattleLocations.SelectedIndex, pokemonArray);
                     }
                     MessageBox.Show("Changes saved succesfully", "Changes saved");
                 }
@@ -324,142 +320,38 @@ namespace StarterEdit
 
         private void BattleLocations_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            int selectedIndex;
-            selectedIndex = BattleLocations.SelectedIndex;
-            switch (selectedIndex)
-            {
-                case 0: // route 22 battle 1
-                    BattleLvl3.IsEnabled = false;
-                    BattlePokemon3.IsEnabled = false;
-                    BattleLvl4.IsEnabled = false;
-                    BattlePokemon4.IsEnabled = false;
-                    BattleLvl5.IsEnabled = false;
-                    BattlePokemon5.IsEnabled = false;
-                    BattleLvl6.IsEnabled = false;
-                    BattlePokemon6.IsEnabled = false;
+            BattleName selectedBattle = (BattleName)BattleLocations.SelectedIndex;
 
-                    if (isYellow)
+            Dictionary<BattleName, bool[]> battleElementsStates = new Dictionary<BattleName, bool[]>()
+                {
+                    { BattleName.Route22_1, new bool[] { false, false, false, false } },
+                    { BattleName.CeruleanCity, new bool[] { true, true, false, false } },
+                    { BattleName.SSAnne, new bool[] { true, true, false, false } },
+                    { BattleName.PokemonTower, new bool[] { true, true, true, false } },
+                    { BattleName.SilphCo, new bool[] { true, true, true, false } },
+                    { BattleName.Route22_2, new bool[] { true, true, true, true } },
+                    { BattleName.IndigoPlateau, new bool[] { true, true, true, true } }
+                };
+
+            if (battleElementsStates.ContainsKey(selectedBattle)) {
+                enableBattleElements(battleElementsStates[selectedBattle]);
+
+                if (!isYellow) {
+                    refershData(getCurrentChoice());
+                }
+
+                if (isYellow)
+                {
+                    if ((int)selectedBattle >= 3)
+                    {
+                        showCaseRadioButtons();
+                        refershData(getCurrentCase());
+                    }
+                    else if ((int)selectedBattle < 3)
                     {
                         hideCaseRadioButtons();
                     }
-                    refershData(getCurrentChoice());
-                    break;
-
-                case 1: // cerulean city
-                    BattleLvl3.IsEnabled = true;
-                    BattlePokemon3.IsEnabled = true;
-                    BattleLvl4.IsEnabled = true;
-                    BattlePokemon4.IsEnabled = true;
-                    BattleLvl5.IsEnabled = false;
-                    BattlePokemon5.IsEnabled = false;
-                    BattleLvl6.IsEnabled = false;
-                    BattlePokemon6.IsEnabled = false;
-
-                    if (isYellow)
-                    {
-                        hideCaseRadioButtons();
-                    }
-                    refershData(getCurrentChoice());
-                    break;
-
-                case 2: // S.S Anne
-                    BattleLvl3.IsEnabled = true;
-                    BattlePokemon3.IsEnabled = true;
-                    BattleLvl4.IsEnabled = true;
-                    BattlePokemon4.IsEnabled = true;
-                    BattleLvl5.IsEnabled = false;
-                    BattlePokemon5.IsEnabled = false;
-                    BattleLvl6.IsEnabled = false;
-                    BattlePokemon6.IsEnabled = false;
-
-                    if (isYellow)
-                    {
-                        hideCaseRadioButtons();
-                    }
-                    refershData(getCurrentChoice());
-                    break;
-
-                case 3: // pokemon tower
-                    BattleLvl3.IsEnabled = true;
-                    BattlePokemon3.IsEnabled = true;
-                    BattleLvl4.IsEnabled = true;
-                    BattlePokemon4.IsEnabled = true;
-                    BattleLvl5.IsEnabled = true;
-                    BattlePokemon5.IsEnabled = true;
-                    BattleLvl6.IsEnabled = false;
-                    BattlePokemon6.IsEnabled = false;
-
-                    if (isYellow)
-                    {
-                        showCaseRadioButtons();
-                        refershData(getCurrentCase());
-                    } else
-                    {
-                        refershData(getCurrentChoice());
-                    }
-                    break;
-
-                case 4: // silph co
-                    BattleLvl3.IsEnabled = true;
-                    BattlePokemon3.IsEnabled = true;
-                    BattleLvl4.IsEnabled = true;
-                    BattlePokemon4.IsEnabled = true;
-                    BattleLvl5.IsEnabled = true;
-                    BattlePokemon5.IsEnabled = true;
-                    BattleLvl6.IsEnabled = false;
-                    BattlePokemon6.IsEnabled = false;
-
-                    if (isYellow)
-                    {
-                        showCaseRadioButtons();
-                        refershData(getCurrentCase());
-                    } else
-                    {
-                        refershData(getCurrentChoice());
-                    }
-                    break;
-
-                case 5: // route 22 battle 2
-                    BattleLvl3.IsEnabled = true;
-                    BattlePokemon3.IsEnabled = true;
-                    BattleLvl4.IsEnabled = true;
-                    BattlePokemon4.IsEnabled = true;
-                    BattleLvl5.IsEnabled = true;
-                    BattlePokemon5.IsEnabled = true;
-                    BattleLvl6.IsEnabled = true;
-                    BattlePokemon6.IsEnabled = true;
-
-                    if (isYellow)
-                    {
-                        showCaseRadioButtons();
-                        refershData(getCurrentCase());
-                    }
-                    else
-                    {
-                        refershData(getCurrentChoice());
-                    }
-                    break;
-
-                case 6: // indigo plateau
-                    BattleLvl3.IsEnabled = true;
-                    BattlePokemon3.IsEnabled = true;
-                    BattleLvl4.IsEnabled = true;
-                    BattlePokemon4.IsEnabled = true;
-                    BattleLvl5.IsEnabled = true;
-                    BattlePokemon5.IsEnabled = true;
-                    BattleLvl6.IsEnabled = true;
-                    BattlePokemon6.IsEnabled = true;
-
-                    if (isYellow)
-                    {
-                        showCaseRadioButtons();
-                        refershData(getCurrentCase());
-                    }
-                    else
-                    {
-                        refershData(getCurrentChoice());
-                    }
-                    break;
+                }
             }
         }
 
@@ -544,35 +436,7 @@ namespace StarterEdit
             }
         }
 
-        public void canSaveChoiceSquirtle(int battleSelected, int[] pokemonArray)
-        {
-            IPlayersChoice pokemonChoice = getPokemonChoice();
-
-            if (pokemonChoice != null)
-            {
-                BattleName selectedBattle = (BattleName)battleSelected;
-                Dictionary<DataType, long[]> battleData = pokemonChoice.getBattle(selectedBattle);
-
-                writeHelper.writeBattleLvls(battleData[DataType.Level], writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(battleData[DataType.Pokemon], writer, pokemonArray);
-            }
-        }
-
-        public void canSaveChoiceBulbasaur(int battleSelected, int[] pokemonArray)
-        {
-           IPlayersChoice pokemonChoice = getPokemonChoice();
-
-            if (pokemonChoice != null)
-            {
-                BattleName selectedBattle = (BattleName)battleSelected;
-                Dictionary<DataType, long[]> battleData = pokemonChoice.getBattle(selectedBattle);
-
-                writeHelper.writeBattleLvls(battleData[DataType.Level], writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(battleData[DataType.Pokemon], writer, pokemonArray);
-            }
-        }
-
-        public void canSaveChoiceCharmander(int battleSelected, int[] pokemonArray)
+        public void canSave(int battleSelected, int[] pokemonArray)
         {
             IPlayersChoice pokemonChoice = getPokemonChoice();
 
@@ -755,6 +619,31 @@ namespace StarterEdit
             case_3.IsEnabled = false;
         }
 
+        public void enableBattleElements(bool[] bools)
+        {
+            BattleLvl3.IsEnabled = false;
+            BattleLvl4.IsEnabled = false;
+            BattleLvl5.IsEnabled = false;
+            BattleLvl6.IsEnabled = false;
+
+            BattlePokemon3.IsEnabled = false;
+            BattlePokemon4.IsEnabled = false;
+            BattlePokemon5.IsEnabled = false;
+            BattlePokemon6.IsEnabled = false;
+
+            TextBox[] battleLvls = new TextBox[] { BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6 };
+            ComboBox[] battlePokemon = new ComboBox[] { BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6 };
+
+            for (int i = 0; i < bools.Length; i++) {
+                battleLvls[i].IsEnabled = bools[i];
+                battlePokemon[i].IsEnabled = bools[i];
+
+                if (!battleLvls[i].IsEnabled) {
+                    battleLvls[i].Text = "0";
+                }
+            }
+        }
+
         public void refershData(RadioButton currentChoice)
         {
             if (currentChoice == null)
@@ -900,5 +789,4 @@ namespace StarterEdit
         }
 
     }
-
 }
