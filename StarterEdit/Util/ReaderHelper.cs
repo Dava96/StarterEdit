@@ -30,7 +30,7 @@ namespace StarterEdit.Util
             return rName.Trim();
         }
 
-        public String getRomVersion(BinaryReader reader, long[] fileIdentifer)
+        public Version getRomVersion(BinaryReader reader, long[] fileIdentifer)
         {
             String hexVal = "";
             String blueIdentfier = "D39DA";
@@ -46,19 +46,18 @@ namespace StarterEdit.Util
 
             if (hexVal.Equals(redIdentfier))
             {
-                return "red";
+                return Version.Red;
             } 
             else if (hexVal.Equals(blueIdentfier))
             {
-                return "blue";
+                return Version.Blue;
             } else if (hexVal.Equals(yellowIdentfier))
             {
-                return "yellow";
+                return Version.Yellow;
             } else
             {
-                return "green";
+                return Version.Green;
             }
-      
         }
 
         public void readBattleLvls(long[] levelArray, BinaryReader reader, TextBox[] battleBoxes)

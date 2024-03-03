@@ -4,11 +4,11 @@ using StarterEdit;
 
 namespace StarterEdit
 {
-    class PlayersChoiceBulbasaur : IPlayersChoice
+    class GreenBulbasaur : IPlayersChoice
     {
         Dictionary<BattleName, Dictionary<DataType, long[]>> battleData = new Dictionary<BattleName, Dictionary<DataType, long[]>>();
 
-        public PlayersChoiceBulbasaur()
+        public GreenBulbasaur()
         {
             battleData[BattleName.Route22_1] = new Dictionary<DataType, long[]>
             {
