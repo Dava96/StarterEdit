@@ -68,22 +68,6 @@ namespace StarterEdit.Util
             }
         }
 
-
-        // public void writeBattleLvls(long[] offsetArray, StreamWriter writer, TextBox[] levelBoxes)
-        // {
-        //     {
-
-        //         TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
-        //         for (int i = 0; i < offsetArray.Length; i++)
-        //         {
-        //             writer.BaseStream.Position = offsetArray[i];
-
-        //             writer.BaseStream.WriteByte((byte)Int32.Parse(levelBoxes[i].Text.ToString()));
-        //             writer.Flush();
-        //         }
-        //     }
-        // }
-
         public void writeBattleLvls(long[] offsetArray, StreamWriter writer, TextBox levelBox)
         {
             {
@@ -98,8 +82,6 @@ namespace StarterEdit.Util
                 }
             }
         }
-
-
 
         public void writeBattleLvls(long[] offsetArray, StreamWriter writer, TextBox[] levelBoxes)
         {

@@ -75,23 +75,6 @@ namespace StarterEdit.Util
             }
         }
 
-
-        // public void readBattleLvls(long[] offsetArray, BinaryReader reader, TextBox levelBox, TextBox levelBox2, TextBox levelBox3)
-        // {
-
-        //     // This deals with the first battle, not entirely sure why I've written this twice to do the same thing
-
-        //     TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
-        //     int pokemonLevel = 0;
-        //     for (int i = 0; i < offsetArray.Length; i++)
-        //     {
-        //         reader.BaseStream.Position = offsetArray[i];
-        //         string hexVal = string.Format("{0:X}", reader.ReadByte());
-        //         pokemonLevel = Convert.ToInt32(hexVal, 16);
-        //         levelBoxes[i].Text = pokemonLevel.ToString();
-        //     }
-        // }
-
         public void readBattleLvls(long[] offsetArray, BinaryReader reader, TextBox levelBox)
         {
 
