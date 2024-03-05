@@ -13,7 +13,6 @@ namespace StarterEdit
     {
         public readonly Regex numbersOnly = new Regex("[^0-9.-]+"); // Used force text input on the text boxes
         PokemonData pokemonData = new PokemonData();
-        Offsets offsets = new Offsets();
         Dictionary<DataType, long[]> firstRivalBattle;
         Dictionary<DataType, long[]> catchingPikachuBattle;
         Dictionary<Choice, long[]> starterOffsets;
@@ -28,7 +27,6 @@ namespace StarterEdit
  
         BinaryReader reader;
         StreamWriter writer;
-        bool isYellow = false;
 
         Util.ReaderHelper readerHelper = new Util.ReaderHelper();
         Util.WriteHelper writeHelper = new Util.WriteHelper();
@@ -65,7 +63,7 @@ namespace StarterEdit
                 openDialog.Filter = "PKM R/B/G (*.gb)|*.gb|PKM Y (*.gbc)|*.gbc";
                 openDialog.ShowDialog();
                 reader = new BinaryReader(File.Open(openDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.Write));
-                Version version = readerHelper.getRomVersion(reader, offsets.getFileIdentifier());
+                Version version = readerHelper.getRomVersion(reader, Game.FileIdentifierOffsets);
                 versionMap(version);
                 setup();
                 UiLoad();
@@ -218,7 +216,7 @@ namespace StarterEdit
                 readerHelper.readBattleLvls(firstRivalBattle[DataType.Level], reader, getLevelBoxes());
                 autoScroll.IsChecked = readerHelper.readPatches(autoScrollLocation, reader);
             }
-            StarterEditWindow.Title = "Starter Edit | " + readerHelper.getNameOfRomLoaded(reader, offsets.getRomName()); // Sets rom name as title
+            StarterEditWindow.Title = "Starter Edit | " + readerHelper.getNameOfRomLoaded(reader, Game.RomName); // Sets rom name as title
         }
 
          public void readStarterPokemon(long[] offsetArray, BinaryReader reader, Label Starter, ComboBox List, int starterNumber)
@@ -249,7 +247,7 @@ namespace StarterEdit
         private void setPlayerChoice()
         {
             // sets the radio buttons text to what the players choice of starter is
-            if (isYellow)
+            if (loadedVersion.Equals(Version.Yellow))
             {
                 playerChoice_Pikachu.Content = Starter2.Content.ToString();
             } else
@@ -321,7 +319,7 @@ namespace StarterEdit
 
         public RadioButton getCurrentCase()
         {
-            if (isYellow)
+            if (loadedVersion.Equals(Version.Yellow))
             {
                 if (isCase1Checked())
                 {
