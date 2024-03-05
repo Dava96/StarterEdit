@@ -82,9 +82,9 @@
             <RadioButton x:Name="choiceBulbasaur" Content="Bulbasaur" ToolTip="Players Starter Pokemon" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="False" Checked="playerChoice_Checked" IsEnabled="False"/>
             <RadioButton x:Name="choiceCharmander" Content="Charmander" ToolTip="Players Starter Pokemon" VerticalAlignment="Center" HorizontalAlignment="Left" IsChecked="False" Checked="playerChoice_Checked" IsEnabled="False"/>
             
-            <RadioButton x:Name="case_1" Content="Case_1" ToolTip="Players Starter Pokemon" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="case_1_Checked" IsEnabled="False" Visibility="Hidden"/>
-            <RadioButton x:Name="case_2" Content="Case_2" ToolTip="Players Starter Pokemon" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="case_2_Checked" IsEnabled="False" Visibility="Hidden"/>
-            <RadioButton x:Name="case_3" Content="Case_3" ToolTip="Players Starter Pokemon" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="case_3_Checked" IsEnabled="False" Visibility="Hidden"/>
+            <RadioButton x:Name="case_1" Content="Case_1" ToolTip="Players Starter Pokemon" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="playerChoice_Checked" IsEnabled="False" Visibility="Hidden"/>
+            <RadioButton x:Name="case_2" Content="Case_2" ToolTip="Players Starter Pokemon" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="playerChoice_Checked" IsEnabled="False" Visibility="Hidden"/>
+            <RadioButton x:Name="case_3" Content="Case_3" ToolTip="Players Starter Pokemon" HorizontalAlignment="Left" VerticalAlignment="Center" IsChecked="False" Checked="playerChoice_Checked" IsEnabled="False" Visibility="Hidden"/>
 
         </UniformGrid>
         

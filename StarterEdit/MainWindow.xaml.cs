@@ -32,7 +32,6 @@ namespace StarterEdit
 
         Util.ReaderHelper readerHelper = new Util.ReaderHelper();
         Util.WriteHelper writeHelper = new Util.WriteHelper();
-        PokemonYellowOffsets pokemonYellowOffsets = new PokemonYellowOffsets();
         Game game;
 
         public MainWindow()
@@ -117,14 +116,14 @@ namespace StarterEdit
                             BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex};
                 if (writeHelper.checkInputs(LevelBox, LevelBox2, LevelBox3, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6, Pikachu_LevelBox)) // If inputs aren't valid correct them
                 {
-                    if (isYellow)
+                    if (loadedVersion.Equals(Version.Yellow))
                     {
                         writeHelper.writeStarterPokemon(catchingPikachuBattle[DataType.Pokemon], writer, NameList2.SelectedIndex, 1); // Writes the users first pokemon
                         writeHelper.writeBattleLvls(catchingPikachuBattle[DataType.Level], writer, Pikachu_LevelBox); // writes the users first level
 
                         writeHelper.writeBattlePkm(firstRivalBattle[DataType.Pokemon], writer, NameList5.SelectedIndex);
                         writeHelper.writeBattleLvls(firstRivalBattle[DataType.Level], writer, LevelBox2); // writes the rivals levels for the first battle
-                        canSaveYellow(BattleLocations.SelectedIndex, pokemonArray);
+                        canSave(BattleLocations.SelectedIndex, pokemonArray);
                     }
                     else
                     {
@@ -207,6 +206,7 @@ namespace StarterEdit
                 readStarterPokemon(firstRivalBattle[DataType.Pokemon], reader, RivalStarter2, NameList5, 1);
                 readerHelper.readBattleLvls(catchingPikachuBattle[DataType.Level], reader, LevelBox2);
 
+
             } else {
 
                 readStarterPokemon(starterOffsets, reader, [Starter1, Starter2, Starter3], [NameList, NameList2, NameList3], [0, 1, 2]);
@@ -235,33 +235,6 @@ namespace StarterEdit
             currentPokmon[starterNumber] = (byte)decVal;
             setPlayerChoice();
         }
-
-        // public void setupForYellow()
-        // {
-        //     if (isYellow)
-        //     {
-        //         playerChoice_Pikachu.IsChecked = true;
-        //         Pikachu_Label.Visibility = Visibility.Visible;
-        //         Pikachu_LevelBox.Visibility = Visibility.Visible;
-        //         readStarterPokemon(pokemonYellowOffsets.yellowFirstBattle, reader, Starter2, NameList2, 1);
-        //         readerHelper.readBattleLvls(pokemonYellowOffsets.yellowFirstBattleUserLvl, reader, Pikachu_LevelBox);
-        //         readStarterPokemon(pokemonYellowOffsets.yellowFirstBattleRival, reader, RivalStarter2, NameList5, 1);
-        //         readerHelper.readBattleLvls(pokemonYellowOffsets.yellowFirstBattleRivalLvl, reader, LevelBox2);
-
-        //         patches.Visibility = Visibility.Hidden;
-
-        //         playerChoice_Pikachu.Visibility = Visibility.Visible;
-         
-        //         NameList.IsEnabled = false;
-        //         NameList3.IsEnabled = false;
-        //         NameList4.IsEnabled = false;
-        //         NameList6.IsEnabled = false;
-        //         LevelBox.IsEnabled = false;
-        //         LevelBox3.IsEnabled = false;
-        //         StarterEditWindow.Title = "Starter Edit | " + readerHelper.getNameOfRomLoaded(reader, romName); // Sets rom name as title
-        //         hideRadioButtons();
-        //     }
-        // }
         
         public bool isTextAllowed(string text) // checks to see if the input given is text
         {
@@ -305,11 +278,11 @@ namespace StarterEdit
             if (battleElementsStates.ContainsKey(selectedBattle)) {
                 enableBattleElements(battleElementsStates[selectedBattle]);
 
-                if (!isYellow) {
+                if (!loadedVersion.Equals(Version.Yellow)) {
                     refershData(getCurrentChoice());
                 }
 
-                if (isYellow)
+                if (loadedVersion.Equals(Version.Yellow))
                 {
                     if ((int)selectedBattle >= 3)
                     {
@@ -319,6 +292,7 @@ namespace StarterEdit
                     else if ((int)selectedBattle < 3)
                     {
                         hideCaseRadioButtons();
+                        refershData(getCurrentChoice());
                     }
                 }
             }
@@ -338,7 +312,7 @@ namespace StarterEdit
             {
                 return choiceCharmander;
             }
-            if (isPikachuChecked() && isYellow)
+            if (isPikachuChecked() && loadedVersion.Equals(Version.Yellow))
             {
                 return playerChoice_Pikachu;
             }
@@ -368,7 +342,7 @@ namespace StarterEdit
             return case_1;
         }
 
-        private void playerChoice_Checked(object sender, RoutedEventArgs e) // squirtle radio button
+        private void playerChoice_Checked(object sender, RoutedEventArgs e)
         {
             int battleSelected = BattleLocations.SelectedIndex;
 
@@ -386,24 +360,17 @@ namespace StarterEdit
 
         private void playerChoice_Checked_Pikachu(object sender, RoutedEventArgs e) // pikachu
         {
-            int battleSelected = BattleLocations.SelectedIndex; 
+            int battleSelected = BattleLocations.SelectedIndex;
 
-            
+            IPlayersChoice pokemonChoice = getPokemonChoice();
 
-            if (isPikachuChecked() && battleSelected == 0 && isYellow)
+            if (battleSelected < 3 && isPikachuChecked())
             {
-                readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22Lvl, reader, getBattleBoxes());
-                readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleRoute22PKM, reader, getPokemonBoxes());
-            }
-            else if (isPikachuChecked() && battleSelected == 1 && isYellow)
-            {
-                readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleCeruleanCityLvl, reader, getBattleBoxes());
-                readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleCeruleanCityPKM, reader, getPokemonBoxes());
-            }
-            else if (isPikachuChecked() && battleSelected == 2 && isYellow)
-            {
-                readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleSSAnneLvl, reader, getBattleBoxes());
-                readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleSSAnnePKM, reader, getPokemonBoxes());
+                BattleName selectedBattle = (BattleName)battleSelected;
+                Dictionary<DataType, long[]> battleData = eveeBattles[selectedBattle];
+
+                readerHelper.readBattleLvls(battleData[DataType.Level], reader, getBattleBoxes());
+                readerHelper.readBattlePokemon(battleData[DataType.Pokemon], reader, getPokemonBoxes());
             }
         }
 
@@ -419,85 +386,14 @@ namespace StarterEdit
                 writeHelper.writeBattleLvls(battleData[DataType.Level], writer, getBattleBoxes());
                 writeHelper.writeBattlePkm(battleData[DataType.Pokemon], writer, pokemonArray);
             }
-        }
 
-        public void canSaveYellow(int battleSelected, int[] pokemonArray)
-        {
-            //pkm1 - pkm6 is the choice index selected
-            if (isPikachuChecked() && battleSelected == 0) // route 22
+            if (pokemonChoice == null)
             {
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleRoute22PKM, writer, pokemonArray);
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22Lvl, writer, getBattleBoxes());
-            } 
-            else if (isPikachuChecked() && battleSelected == 1) // cerulean city
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleCeruleanCityLvl, writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleCeruleanCityPKM, writer, pokemonArray);
-            }
-            else if (isPikachuChecked() && battleSelected == 2) // SS Anne
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleSSAnneLvl, writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleSSAnnePKM, writer, pokemonArray);
-            }
-            else if (isPikachuChecked() && battleSelected == 3 && isCase1Checked()) // Pokemon tower Case 1
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC1Lvl, writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC1PKM, writer, pokemonArray);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 3 && isCase2Checked()) // Pokemon tower Case 2
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC2Lvl, writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC2PKM, writer, pokemonArray);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 3 && isCase3Checked()) // Pokemon tower Case 3
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC3Lvl, writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC3PKM, writer, pokemonArray);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 4 && isCase1Checked()) // Silph Co. Case 1
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleSilphCoC1Lvl, writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleSilphCoC1PKM, writer, pokemonArray);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 4 && isCase2Checked()) // Silph Co. Case 2
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleSilphCoC2Lvl, writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleSilphCoC2PKM, writer, pokemonArray);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 4 && isCase3Checked()) // Silph Co. Case 3
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleSilphCoC3Lvl, writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleSilphCoC3PKM, writer, pokemonArray);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 5 && isCase1Checked()) // Route 22 (2) case 1
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22C1Lvl, writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleRoute22C1PKM, writer, pokemonArray);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 5 && isCase2Checked()) // Route 22 (2) case 2
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22C2Lvl, writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleRoute22C2PKM, writer, pokemonArray);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 5 && isCase3Checked()) // Route 22 (2) case 3
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22C3Lvl, writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleRoute22C3PKM, writer, pokemonArray);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 6 && isCase1Checked()) // Indigo Plateau case 1
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC1Lvl, writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC1PKM, writer, pokemonArray);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 6 && isCase2Checked()) // Indigo Plateau case 2
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC2Lvl, writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC2PKM, writer, pokemonArray);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 6 && isCase3Checked()) // Indigo Plateau case 3
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC3Lvl, writer, getBattleBoxes());
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC3PKM, writer, pokemonArray);
+                BattleName selectedBattle = (BattleName)battleSelected;
+                Dictionary<DataType, long[]> battleData = eveeBattles[selectedBattle];
+
+                writeHelper.writeBattleLvls(battleData[DataType.Level], writer, getBattleBoxes());
+                writeHelper.writeBattlePkm(battleData[DataType.Pokemon], writer, pokemonArray);
             }
         }
 
@@ -521,6 +417,21 @@ namespace StarterEdit
             if (isCharmanderChecked()) {
                 resetRadioButtons(choiceSquirtle, choiceBulbasaur);
                 return game.GetPlayersChoice(Choice.Charmander);
+            }
+
+            if (isCase1Checked()) {
+                resetRadioButtons(case_2, case_3);
+                return game.GetPlayersChoice(Choice.Jolteon);
+            }
+
+            if (isCase2Checked()) {
+                resetRadioButtons(case_1, case_3);
+                return game.GetPlayersChoice(Choice.Flareon);
+            }
+
+            if (isCase3Checked()) {
+                 resetRadioButtons(case_1, case_2);
+                return game.GetPlayersChoice(Choice.Vaporeon);
             }
 
             return null;
@@ -621,93 +532,6 @@ namespace StarterEdit
             {
                 currentChoice.IsChecked = false;
                 currentChoice.IsChecked = true;
-            }
-        }
-
-        private void case_1_Checked(object sender, RoutedEventArgs e)
-        {
-            if (isYellow)
-            {
-                int battleSelected = BattleLocations.SelectedIndex;
-
-                if (battleSelected == 3)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC1Lvl, reader, getBattleBoxes());
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC1PKM, reader, getPokemonBoxes());
-                }
-                else if (battleSelected == 4)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleSilphCoC1Lvl, reader, getBattleBoxes());
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleSilphCoC1PKM, reader, getPokemonBoxes());
-                }
-                else if (battleSelected == 5)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22C1Lvl, reader, getBattleBoxes());
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleRoute22C1PKM, reader, getPokemonBoxes());
-                }
-                else if (battleSelected == 6)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC1Lvl, reader, getBattleBoxes());
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC1PKM, reader, getPokemonBoxes());
-                }
-            }
-        }
-
-        private void case_2_Checked(object sender, RoutedEventArgs e)
-        {
-            if (isYellow)
-            {
-                int battleSelected = BattleLocations.SelectedIndex;
-
-                if (battleSelected == 3)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC2Lvl, reader, getBattleBoxes());
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC2PKM, reader, getPokemonBoxes());
-                }
-                else if (battleSelected == 4)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleSilphCoC2Lvl, reader, getBattleBoxes());
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleSilphCoC2PKM, reader, getPokemonBoxes());
-                }
-                else if (battleSelected == 5)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22C2Lvl, reader, getBattleBoxes());
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleRoute22C2PKM, reader, getPokemonBoxes());
-                }
-                else if (battleSelected == 6)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC2Lvl, reader, getBattleBoxes());
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC2PKM, reader, getPokemonBoxes());
-                }
-            }
-        }
-
-        private void case_3_Checked(object sender, RoutedEventArgs e)
-        {
-            if (isYellow)
-            {
-                int battleSelected = BattleLocations.SelectedIndex;
-
-                if (battleSelected == 3)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC3Lvl, reader, getBattleBoxes());
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC3PKM, reader, getPokemonBoxes());
-                } 
-                else if (battleSelected == 4)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleSilphCoC3Lvl, reader, getBattleBoxes());
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleSilphCoC3PKM, reader, getPokemonBoxes());
-                }
-                else if (battleSelected == 5)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22C3Lvl, reader, getBattleBoxes());
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleRoute22C3PKM, reader, getPokemonBoxes());
-                }
-                else if (battleSelected == 6)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC3Lvl, reader, getBattleBoxes());
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC3PKM, reader, getPokemonBoxes());
-                }
             }
         }
 
