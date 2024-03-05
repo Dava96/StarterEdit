@@ -52,11 +52,7 @@ namespace StarterEdit
                 {DataType.Level, new long[] { 0x3a4A0, 0x3a4A2, 0x3a4A4, 0x3a4A6, 0x3a4A8, 0x3a4AA } }
             };
     }
-
-        public void setOffsetsIfGreen(bool isGreen)
-        {
-        }
-
+    
         public Dictionary<DataType, long[]> getBattle(BattleName battleName)
         {
             return battleData[battleName];

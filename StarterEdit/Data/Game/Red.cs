@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using StarterEdit;
 
@@ -12,6 +13,9 @@ namespace StarterEdit
         public Dictionary<DataType, long[]> firstRivalBattle;
         public Dictionary<Choice, long[]> starterOffsets;
         public long autoScrollOffset;
+        public Squirtle squirtle;
+        public Charmander charmander;
+        public Bulbasaur bulbasaur;
 
         public Red()
         {
@@ -35,6 +39,10 @@ namespace StarterEdit
             { DataType.Level, new long[] { 0x3A1E7, 0x3A1EA, 0x3A1E4 }},
             { DataType.Pokemon, new long[] {0x3A1E8, 0x3A1EB, 0x3A1E5 }}
         };
+
+            this.squirtle = new Squirtle();
+            this.bulbasaur = new Bulbasaur();
+            this.charmander = new Charmander();
         }
 
         public override string GetFileIdentifier()
@@ -70,6 +78,22 @@ namespace StarterEdit
         public override Dictionary<DataType, long[]> GetBattlesForPlayersChoice(IPlayersChoice playersChoice, BattleName battleName)
         {
             return playersChoice.getBattle(battleName);
+        }
+
+        public override IPlayersChoice GetPlayersChoice(Choice choice)
+        {
+            switch (choice)
+            {
+                case Choice.Squirtle:
+                    return squirtle;
+                case Choice.Bulbasaur:
+                    return bulbasaur;
+                case Choice.Charmander:
+                    return charmander;
+                default:
+                    // Handle the case where choice doesn't match any of the enum values
+                    throw new ArgumentException("Invalid choice", nameof(choice));
+            }
         }
     }
 }

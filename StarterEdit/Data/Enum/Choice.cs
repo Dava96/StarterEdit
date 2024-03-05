@@ -4,6 +4,10 @@ namespace StarterEdit
     {
         Squirtle,
         Bulbasaur,
-        Charmander
+        Charmander,
+        Jolteon,
+        Flareon,
+        Vaporeon,
+        Pikachu
     }
 }

@@ -53,13 +53,6 @@ namespace StarterEdit
             };
         }
 
-        public void setOffsetsIfGreen(bool isGreen)
-        {
-            if (isGreen)
-            {
-            }
-        }
-
          public Dictionary<DataType, long[]> getBattle(BattleName battleName)
         {
             return battleData[battleName];

@@ -15,8 +15,10 @@ namespace StarterEdit
         PokemonData pokemonData = new PokemonData();
         Offsets offsets = new Offsets();
         Dictionary<DataType, long[]> firstRivalBattle;
+        Dictionary<DataType, long[]> catchingPikachuBattle;
         Dictionary<Choice, long[]> starterOffsets;
         Dictionary<Choice, long[]> rivalsChoice;
+        Dictionary<BattleName, Dictionary<DataType, long[]>> eveeBattles;
         Version loadedVersion;
         long autoScrollLocation;
 
@@ -30,10 +32,6 @@ namespace StarterEdit
 
         Util.ReaderHelper readerHelper = new Util.ReaderHelper();
         Util.WriteHelper writeHelper = new Util.WriteHelper();
-
-        Squirtle squirtle = new Squirtle();
-        Bulbasaur bulbasaur = new Bulbasaur();
-        Charmander charmander = new Charmander();
         PokemonYellowOffsets pokemonYellowOffsets = new PokemonYellowOffsets();
         Game game;
 
@@ -109,8 +107,6 @@ namespace StarterEdit
             }
         }
 
-
-
         private void menuSave_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -123,13 +119,12 @@ namespace StarterEdit
                 {
                     if (isYellow)
                     {
-                        // writeHelper.writeStarterPokemon(pokemonYellowOffsets.yellowFirstBattle, writer, NameList2.SelectedIndex, 1); // Writes the users first pokemon
-                        // writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowFirstBattleUserLvl, writer, Pikachu_LevelBox); // writes the users first level
-                        // writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowFirstBattleRivalLvl, writer, LevelBox2); // writes the rivals levels for the first battle
+                        writeHelper.writeStarterPokemon(catchingPikachuBattle[DataType.Pokemon], writer, NameList2.SelectedIndex, 1); // Writes the users first pokemon
+                        writeHelper.writeBattleLvls(catchingPikachuBattle[DataType.Level], writer, Pikachu_LevelBox); // writes the users first level
 
-                        // writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowFirstBattleRival, writer, NameList5.SelectedIndex);
-
-                        // canSaveYellow(BattleLocations.SelectedIndex, pokemonArray);
+                        writeHelper.writeBattlePkm(firstRivalBattle[DataType.Pokemon], writer, NameList5.SelectedIndex);
+                        writeHelper.writeBattleLvls(firstRivalBattle[DataType.Level], writer, LevelBox2); // writes the rivals levels for the first battle
+                        canSaveYellow(BattleLocations.SelectedIndex, pokemonArray);
                     }
                     else
                     {
@@ -168,7 +163,8 @@ namespace StarterEdit
                 {
                     { Version.Red, () => new Red() },
                     { Version.Blue, () => new Blue() },
-                    { Version.Green, () => new Green() }
+                    { Version.Green, () => new Green() },
+                    { Version.Yellow, () => new Yellow() }
                 };
 
             Func<Game> gameFactory = versionMapping[version];
@@ -182,24 +178,62 @@ namespace StarterEdit
             loadedVersion = game.GetVersion();
             autoScrollLocation = game.GetAutoScroll();
             rivalsChoice = game.GetRivalsChoice();
+
+            if (loadedVersion.Equals(Version.Yellow)) {
+                Yellow yellow = new Yellow();
+                catchingPikachuBattle = yellow.getCatchingPikachuBattle();
+                eveeBattles = yellow.getEveeBattles();
+            }
         }
 
         public void UiLoad()
         {
-            readStarterPokemon(starterOffsets, reader, [Starter1, Starter2, Starter3], [NameList, NameList2, NameList3], [0, 1, 2]);
-            readStarterPokemon(rivalsChoice, reader, [RivalStarter, RivalStarter2, RivalStarter3], [NameList4, NameList5, NameList6], [0, 1, 2]);
+            if (loadedVersion.Equals(Version.Yellow)) {
+                playerChoice_Pikachu.IsChecked = true;
+                Pikachu_Label.Visibility = Visibility.Visible;
+                Pikachu_LevelBox.Visibility = Visibility.Visible;
+                patches.Visibility = Visibility.Hidden;
+                playerChoice_Pikachu.Visibility = Visibility.Visible;
+                NameList.IsEnabled = false;
+                NameList.Visibility = Visibility.Hidden;
+                NameList3.IsEnabled = false;
+                NameList4.IsEnabled = false;
+                NameList6.IsEnabled = false;
+                LevelBox.IsEnabled = false;
+                LevelBox3.IsEnabled = false;
+                hideRadioButtons();
+                readStarterPokemon(catchingPikachuBattle[DataType.Pokemon], reader, Starter2, NameList2, 1);
+                readerHelper.readBattleLvls(catchingPikachuBattle[DataType.Level], reader, Pikachu_LevelBox);
+                readStarterPokemon(firstRivalBattle[DataType.Pokemon], reader, RivalStarter2, NameList5, 1);
+                readerHelper.readBattleLvls(catchingPikachuBattle[DataType.Level], reader, LevelBox2);
 
-            if (!loadedVersion.Equals(Version.Yellow))
-            {
+            } else {
+
+                readStarterPokemon(starterOffsets, reader, [Starter1, Starter2, Starter3], [NameList, NameList2, NameList3], [0, 1, 2]);
+                readStarterPokemon(rivalsChoice, reader, [RivalStarter, RivalStarter2, RivalStarter3], [NameList4, NameList5, NameList6], [0, 1, 2]);
                 choiceSquirtle.IsEnabled = true;
                 choiceBulbasaur.IsEnabled = true;
                 choiceCharmander.IsEnabled = true;
                 choiceSquirtle.IsChecked = true;
+                readerHelper.readBattleLvls(firstRivalBattle[DataType.Level], reader, getLevelBoxes());
+                autoScroll.IsChecked = readerHelper.readPatches(autoScrollLocation, reader);
             }
+            StarterEditWindow.Title = "Starter Edit | " + readerHelper.getNameOfRomLoaded(reader, offsets.getRomName()); // Sets rom name as title
+        }
 
-            readerHelper.readBattleLvls(firstRivalBattle[DataType.Level], reader, getLevelBoxes());
-            autoScroll.IsChecked = readerHelper.readPatches(autoScrollLocation, reader);
-            StarterEditWindow.Title = "Starter Edit | " + readerHelper.getNameOfRomLoaded(reader, offsets.getRomName); // Sets rom name as title
+         public void readStarterPokemon(long[] offsetArray, BinaryReader reader, Label Starter, ComboBox List, int starterNumber)
+        {
+            int decVal = 0;
+            for (int i = 0; i < offsetArray.Length; i++)
+            {
+                reader.BaseStream.Position = offsetArray[i];
+                string hexVal = string.Format("{0:X}", reader.ReadByte());
+                decVal = Convert.ToInt32(hexVal, 16);
+            }
+            Starter.Content = pkmNames[decVal];
+            List.SelectedIndex = decVal;
+            currentPokmon[starterNumber] = (byte)decVal;
+            setPlayerChoice();
         }
 
         // public void setupForYellow()
@@ -354,6 +388,8 @@ namespace StarterEdit
         {
             int battleSelected = BattleLocations.SelectedIndex; 
 
+            
+
             if (isPikachuChecked() && battleSelected == 0 && isYellow)
             {
                 readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22Lvl, reader, getBattleBoxes());
@@ -474,17 +510,17 @@ namespace StarterEdit
         {
             if (isSquirtleChecked()) {
                 resetRadioButtons(choiceBulbasaur, choiceCharmander);
-                return squirtle;
+                return game.GetPlayersChoice(Choice.Squirtle);
             }
 
             if (isBulbasuarChecked()) {
                 resetRadioButtons(choiceSquirtle, choiceCharmander);
-                return bulbasaur;
+                return game.GetPlayersChoice(Choice.Bulbasaur);
             }
 
             if (isCharmanderChecked()) {
                 resetRadioButtons(choiceSquirtle, choiceBulbasaur);
-                return charmander;
+                return game.GetPlayersChoice(Choice.Charmander);
             }
 
             return null;

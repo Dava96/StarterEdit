@@ -13,5 +13,6 @@ namespace StarterEdit
         public abstract long GetAutoScroll();
 
         public abstract Dictionary<DataType, long[]> GetBattlesForPlayersChoice(IPlayersChoice playersChoice, BattleName battleName);
+        public abstract IPlayersChoice GetPlayersChoice(Choice choice);
     }
 }
