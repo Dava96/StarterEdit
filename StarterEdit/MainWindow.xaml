@@ -36,9 +36,9 @@
             <Label x:Name="Starter2" Content="Bulbasaur" ToolTip="Starter Two"/>
             <Label x:Name="Starter3" Content="Charmander" ToolTip="Starter Three"/>
 
-            <ComboBox x:Name="NameList" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True"  ToolTip="List of Pokemon names"/>
-            <ComboBox x:Name="NameList2" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
-            <ComboBox x:Name="NameList3" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
+            <ComboBox x:Name="playerChoice1" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True"  ToolTip="List of Pokemon names"/>
+            <ComboBox x:Name="playerChoice2" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
+            <ComboBox x:Name="playerChoice3" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
             <Label x:Name="Pikachu_Label" Content="Pikachu's Level" ToolTip="Starter One" Visibility="Hidden"/>
             <TextBox x:Name="Pikachu_LevelBox" Text="0" ToolTip="Sets Pikachu's level" MaxLength="3" PreviewTextInput="PreviewTextInput" Visibility="Hidden" />
         </UniformGrid>
@@ -54,9 +54,9 @@
             <Label x:Name="RivalStarter2" Content="Charmander" ToolTip="Rivals Starter"/>
             <Label x:Name="RivalStarter3" Content="Squirtle" ToolTip="Rivals Starter"/>
 
-            <ComboBox x:Name="NameList4" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
-            <ComboBox x:Name="NameList5" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
-            <ComboBox x:Name="NameList6" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
+            <ComboBox x:Name="rivalChoice1" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
+            <ComboBox x:Name="rivalChoice2" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
+            <ComboBox x:Name="rivalChoice3" IsReadOnly="True" SelectedIndex="0" Cursor="Arrow" IsTextSearchEnabled="True" ToolTip="List of Pokemon names"/>
 
             <TextBox x:Name="LevelBox" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>
             <TextBox x:Name="LevelBox2" Text="0" ToolTip="Sets Pokemon level" MaxLength="3" PreviewTextInput="PreviewTextInput"/>

@@ -54,7 +54,6 @@ namespace StarterEdit.Util
             }
         }
 
-
         public void writeBattlePkm(long[] offsetArray, StreamWriter writer, int[] pokemonArray) // Pokemon 1,2 and 3 values from nameList
         {
             for (int i = 0; i < offsetArray.Length; i++)
@@ -117,13 +116,12 @@ namespace StarterEdit.Util
                 }
         }
 
-        public Boolean checkInputs(TextBox levelBox, TextBox levelBox2, TextBox levelBox3, TextBox levelBox4, TextBox levelBox5, TextBox levelBox6, TextBox levelBox7, TextBox levelBox8, TextBox levelBox9, TextBox levelBox10)
+        public Boolean checkInputs(TextBox[] levelBoxes)
         {
             try
             {
                 // checks if the inputs are under 0 or over 255
                 int maxNumber = 254;
-                TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3, levelBox4, levelBox5, levelBox6, levelBox7, levelBox8, levelBox9, levelBox10 };
                 for (int i = 0; i < levelBoxes.Length; i++)
                 {
                     int number = Convert.ToInt32(levelBoxes[i].Text);

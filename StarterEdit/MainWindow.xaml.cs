@@ -31,29 +31,31 @@ namespace StarterEdit
         Util.ReaderHelper readerHelper = new Util.ReaderHelper();
         Util.WriteHelper writeHelper = new Util.WriteHelper();
         Game game;
+        
+        ComboBox[] pokemonDropDowns;
+        TextBox[] textBoxes;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            NameList.ItemsSource = pokemonData.getPokemonNames(); // handles your choice
-            NameList2.ItemsSource = pokemonData.getPokemonNames();
-            NameList3.ItemsSource = pokemonData.getPokemonNames();
+            pokemonDropDowns = new ComboBox[] {
+                playerChoice1, playerChoice2, playerChoice3, rivalChoice1, rivalChoice2, rivalChoice3,
+                BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6
+            };
 
-            NameList4.ItemsSource = pokemonData.getPokemonNames(); // handles rivals choice
-            NameList5.ItemsSource = pokemonData.getPokemonNames();
-            NameList6.ItemsSource = pokemonData.getPokemonNames();
+            textBoxes = new TextBox[] {
+                LevelBox, LevelBox2, LevelBox3, 
+                BattleLvl, BattleLvl2, BattleLvl3, 
+                BattleLvl4, BattleLvl5, BattleLvl6, 
+                Pikachu_LevelBox
+            };
+
+            this.setupDropDowns(pokemonDropDowns);
 
             BattleLocations.ItemsSource = Enum.GetValues(typeof(BattleName)); // gets battle locations
 
             pkmNames = pokemonData.getPokemonNames();
-
-            BattlePokemon1.ItemsSource = pokemonData.getPokemonNames();
-            BattlePokemon2.ItemsSource = pokemonData.getPokemonNames();
-            BattlePokemon3.ItemsSource = pokemonData.getPokemonNames();
-            BattlePokemon4.ItemsSource = pokemonData.getPokemonNames();
-            BattlePokemon5.ItemsSource = pokemonData.getPokemonNames();
-            BattlePokemon6.ItemsSource = pokemonData.getPokemonNames();
         }
 
         private void menuOpen_Click(object sender, RoutedEventArgs e)
@@ -110,30 +112,28 @@ namespace StarterEdit
             {
                 writer = new StreamWriter(File.Open(openDialog.FileName, FileMode.Open, FileAccess.Write, FileShare.Read));
 
-                int[] pokemonArray = new int[] { BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
-                            BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex};
-                if (writeHelper.checkInputs(LevelBox, LevelBox2, LevelBox3, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6, Pikachu_LevelBox)) // If inputs aren't valid correct them
+                if (writeHelper.checkInputs(textBoxes)) // If inputs aren't valid correct them
                 {
                     if (loadedVersion.Equals(Version.Yellow))
                     {
-                        writeHelper.writeStarterPokemon(catchingPikachuBattle[DataType.Pokemon], writer, NameList2.SelectedIndex, 1); // Writes the users first pokemon
+                        writeHelper.writeStarterPokemon(catchingPikachuBattle[DataType.Pokemon], writer, playerChoice2.SelectedIndex, 1); // Writes the users first pokemon
                         writeHelper.writeBattleLvls(catchingPikachuBattle[DataType.Level], writer, Pikachu_LevelBox); // writes the users first level
 
-                        writeHelper.writeBattlePkm(firstRivalBattle[DataType.Pokemon], writer, NameList5.SelectedIndex);
+                        writeHelper.writeBattlePkm(firstRivalBattle[DataType.Pokemon], writer, rivalChoice2.SelectedIndex);
                         writeHelper.writeBattleLvls(firstRivalBattle[DataType.Level], writer, LevelBox2); // writes the rivals levels for the first battle
-                        canSave(BattleLocations.SelectedIndex, pokemonArray);
+                        canSave(BattleLocations.SelectedIndex, this.getBattleSelectedIndex());
                     }
                     else
                     {
-                        writeHelper.writeStarterPokemon(starterOffsets[Choice.Squirtle], writer, NameList.SelectedIndex, 0);
-                        writeHelper.writeStarterPokemon(starterOffsets[Choice.Bulbasaur], writer, NameList2.SelectedIndex, 1);
-                        writeHelper.writeStarterPokemon(starterOffsets[Choice.Bulbasaur], writer, NameList3.SelectedIndex, 2);
+                        writeHelper.writeStarterPokemon(starterOffsets[Choice.Squirtle], writer, playerChoice1.SelectedIndex, 0);
+                        writeHelper.writeStarterPokemon(starterOffsets[Choice.Bulbasaur], writer, playerChoice2.SelectedIndex, 1);
+                        writeHelper.writeStarterPokemon(starterOffsets[Choice.Charmander], writer, playerChoice3.SelectedIndex, 2);
 
                         writeHelper.writeBattleLvls(firstRivalBattle[DataType.Level], writer, getLevelBoxes()); // writes the rivals levels for the first battle
-                        writeHelper.writeBattlePkm(firstRivalBattle[DataType.Pokemon], writer, NameList4.SelectedIndex, NameList5.SelectedIndex, NameList6.SelectedIndex);
+                        writeHelper.writeBattlePkm(firstRivalBattle[DataType.Pokemon], writer, rivalChoice1.SelectedIndex, rivalChoice2.SelectedIndex, rivalChoice3.SelectedIndex);
                         writeHelper.writePatches(autoScrollLocation, writer, autoScroll);
 
-                        canSave(BattleLocations.SelectedIndex, pokemonArray);
+                        canSave(BattleLocations.SelectedIndex, this.getBattleSelectedIndex());
                     }
                     MessageBox.Show("Changes saved succesfully", "Changes saved");
                 }
@@ -191,24 +191,24 @@ namespace StarterEdit
                 Pikachu_LevelBox.Visibility = Visibility.Visible;
                 patches.Visibility = Visibility.Hidden;
                 playerChoice_Pikachu.Visibility = Visibility.Visible;
-                NameList.IsEnabled = false;
-                NameList.Visibility = Visibility.Hidden;
-                NameList3.IsEnabled = false;
-                NameList4.IsEnabled = false;
-                NameList6.IsEnabled = false;
+                playerChoice1.IsEnabled = false;
+                playerChoice1.Visibility = Visibility.Hidden;
+                playerChoice3.IsEnabled = false;
+                rivalChoice1.IsEnabled = false;
+                rivalChoice3.IsEnabled = false;
                 LevelBox.IsEnabled = false;
                 LevelBox3.IsEnabled = false;
                 hideRadioButtons();
-                readStarterPokemon(catchingPikachuBattle[DataType.Pokemon], reader, Starter2, NameList2, 1);
+                readStarterPokemon(catchingPikachuBattle[DataType.Pokemon], reader, Starter2, playerChoice2, 1);
                 readerHelper.readBattleLvls(catchingPikachuBattle[DataType.Level], reader, Pikachu_LevelBox);
-                readStarterPokemon(firstRivalBattle[DataType.Pokemon], reader, RivalStarter2, NameList5, 1);
+                readStarterPokemon(firstRivalBattle[DataType.Pokemon], reader, RivalStarter2, rivalChoice2, 1);
                 readerHelper.readBattleLvls(catchingPikachuBattle[DataType.Level], reader, LevelBox2);
 
 
             } else {
 
-                readStarterPokemon(starterOffsets, reader, [Starter1, Starter2, Starter3], [NameList, NameList2, NameList3], [0, 1, 2]);
-                readStarterPokemon(rivalsChoice, reader, [RivalStarter, RivalStarter2, RivalStarter3], [NameList4, NameList5, NameList6], [0, 1, 2]);
+                readStarterPokemon(starterOffsets, reader, [Starter1, Starter2, Starter3], [playerChoice1, playerChoice2, playerChoice3], [0, 1, 2]);
+                readStarterPokemon(rivalsChoice, reader, [RivalStarter, RivalStarter2, RivalStarter3], [rivalChoice1, rivalChoice2, rivalChoice3], [0, 1, 2]);
                 choiceSquirtle.IsEnabled = true;
                 choiceBulbasaur.IsEnabled = true;
                 choiceCharmander.IsEnabled = true;
@@ -548,6 +548,25 @@ namespace StarterEdit
             return [LevelBox, LevelBox2, LevelBox3];
         }
 
+        private void setupDropDowns(ComboBox[] dropDowns)
+        {
+            foreach (ComboBox comboBox in dropDowns) {
+                comboBox.ItemsSource = pokemonData.getPokemonNames();
+            }
+        }
+
+        private int[] getBattleSelectedIndex()
+        {
+            return [ 
+                    BattlePokemon1.SelectedIndex,
+                    BattlePokemon2.SelectedIndex, 
+                    BattlePokemon3.SelectedIndex,     
+                    BattlePokemon4.SelectedIndex,
+                    BattlePokemon5.SelectedIndex,
+                    BattlePokemon6.SelectedIndex
+                ];
+        }
+
         private void menuHelp_Click(object sender, RoutedEventArgs e)
         {
             MessageBoxButton messageOptions = MessageBoxButton.YesNo;
@@ -576,6 +595,5 @@ namespace StarterEdit
                 }
             }
         }
-
     }
 }
