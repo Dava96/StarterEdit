@@ -8,10 +8,17 @@ namespace StarterEdit.Util
 {
     class ReaderHelper
     {
+        private string redIdentfier;
+        private string blueIdentfier;
+        private string yellowIdentfier;
+        private string greenIdentfier;
 
         public ReaderHelper()
         {
-
+            this.yellowIdentfier = "9747C";
+            this.greenIdentfier = "9CDDD5";
+            this.redIdentfier ="2091E6";
+            this.blueIdentfier = "D39DA";
         }
 
         public string getNameOfRomLoaded(BinaryReader reader, long[] romName)
@@ -30,13 +37,9 @@ namespace StarterEdit.Util
             return rName.Trim();
         }
 
-        public String getRomVersion(BinaryReader reader, long[] fileIdentifer)
+        public Version getRomVersion(BinaryReader reader, long[] fileIdentifer)
         {
             String hexVal = "";
-            String blueIdentfier = "D39DA";
-            String redIdentfier = "2091E6";
-            String yellowIdentfier = "9747C";
-            String greenIdentfier = "9CDDD5";
 
             for (int i = 0; i < fileIdentifer.Length; i++)
             {
@@ -44,26 +47,24 @@ namespace StarterEdit.Util
                hexVal += string.Format("{0:X}", reader.ReadByte());
             }
 
-            if (hexVal.Equals(redIdentfier))
+            if (hexVal.Equals(this.redIdentfier))
             {
-                return "red";
+                return Version.Red;
             } 
-            else if (hexVal.Equals(blueIdentfier))
+            else if (hexVal.Equals(this.blueIdentfier))
             {
-                return "blue";
-            } else if (hexVal.Equals(yellowIdentfier))
+                return Version.Blue;
+            } else if (hexVal.Equals(this.yellowIdentfier))
             {
-                return "yellow";
+                return Version.Yellow;
             } else
             {
-                return "green";
+                return Version.Green;
             }
-      
         }
 
-        public void readBattleLvls(long[] levelArray, BinaryReader reader, TextBox box1, TextBox box2, TextBox box3, TextBox box4, TextBox box5, TextBox box6)
+        public void readBattleLvls(long[] levelArray, BinaryReader reader, TextBox[] battleBoxes)
         {
-            TextBox[] battleBoxes = new TextBox[] { box1, box2, box3, box4, box5, box6 };
             int pokemonLevel = 0;
             for (int i = 0; i < levelArray.Length; i++)
             {
@@ -77,39 +78,6 @@ namespace StarterEdit.Util
             }
         }
 
-
-        public void readBattleLvls(long[] offsetArray, BinaryReader reader, TextBox levelBox, TextBox levelBox2, TextBox levelBox3)
-        {
-
-            // This deals with the first battle, not entirely sure why I've written this twice to do the same thing
-
-            TextBox[] levelBoxes = new TextBox[] { levelBox, levelBox2, levelBox3 };
-            int pokemonLevel = 0;
-            for (int i = 0; i < offsetArray.Length; i++)
-            {
-                reader.BaseStream.Position = offsetArray[i];
-                string hexVal = string.Format("{0:X}", reader.ReadByte());
-                pokemonLevel = Convert.ToInt32(hexVal, 16);
-                levelBoxes[i].Text = pokemonLevel.ToString();
-            }
-        }
-
-        public void readBattleLvls(long[] offsetArray, BinaryReader reader, TextBox levelBox)
-        {
-
-            // This deals with the first battle for pokemon yellow as there is only one pokemon at the start
-
-            TextBox[] levelBoxes = new TextBox[] { levelBox };
-            int pokemonLevel = 0;
-            for (int i = 0; i < offsetArray.Length; i++)
-            {
-                reader.BaseStream.Position = offsetArray[i];
-                string hexVal = string.Format("{0:X}", reader.ReadByte());
-                pokemonLevel = Convert.ToInt32(hexVal, 16);
-                levelBoxes[i].Text = pokemonLevel.ToString();
-            }
-        }
-
         public bool readPatches(long offset, BinaryReader reader)
         {
             reader.BaseStream.Position = offset;
@@ -120,10 +88,8 @@ namespace StarterEdit.Util
             return true;
         }
 
-        public void readBattlePokemon(long[] offsetArray, BinaryReader reader, ComboBox pkm1, ComboBox pkm2, ComboBox pkm3, ComboBox pkm4, ComboBox pkm5, ComboBox pkm6)
+        public void readBattlePokemon(long[] offsetArray, BinaryReader reader, ComboBox[] pokemon)
         {
-
-            ComboBox[] pokemon = new ComboBox[] { pkm1, pkm2, pkm3, pkm4, pkm5, pkm6 };
             int decVal = 0;
             for (int i = 0; i < offsetArray.Length; i++)
             {

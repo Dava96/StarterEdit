@@ -11,7 +11,6 @@ namespace StarterEdit
         public string[] pokemonHexValues;
         public string[] pokemonNames;
         public string[] pokedexOrderedNames;
-        public string[] battleLocations = new string[] { "Route 22 (1)", "Cerulean City", "S.S Anne", "Pokemon Tower", "Silph Co.", "Route 22 (2)", "Indigo Plateau"};
         private StreamReader readNames;
 
         public PokemonData()
@@ -102,11 +101,5 @@ namespace StarterEdit
         {
             return pokemonDecimals;
         }
-
-        public string[] getBattleLocations()
-        {
-            return battleLocations;
-        }
-
     }
 }

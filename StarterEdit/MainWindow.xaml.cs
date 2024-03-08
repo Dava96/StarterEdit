@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Win32;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace StarterEdit
 {
@@ -12,89 +13,61 @@ namespace StarterEdit
     {
         public readonly Regex numbersOnly = new Regex("[^0-9.-]+"); // Used force text input on the text boxes
         PokemonData pokemonData = new PokemonData();
-        Offsets offsets = new Offsets();
-        static OpenFileDialog openDialog = new OpenFileDialog();
-        string[] pkmNames;
-        long[] sqrtlOffsets;
-        long[] bulbOffsets;
-        long[] charmOffsets;
-        long[] firstBattleLevels;
-        long[] firstBattlePokemon;
-        long[] rivalChoiceSquirtle;
-        long[] rivalChoiceBulbasaur;
-        long[] rivalChoiceCharmander;
-        long[] romName;
-        long[] fileIdentfier;
-        byte[] currentPokmon = new byte[3];
+        Dictionary<DataType, long[]> firstRivalBattle;
+        Dictionary<DataType, long[]> catchingPikachuBattle;
+        Dictionary<Choice, long[]> starterOffsets;
+        Dictionary<Choice, long[]> rivalsChoice;
+        Dictionary<BattleName, Dictionary<DataType, long[]>> eveeBattles;
+        Version loadedVersion;
         long autoScrollLocation;
 
+        static OpenFileDialog openDialog = new OpenFileDialog();
+        string[] pkmNames;
+        byte[] currentPokmon = new byte[3];
+ 
         BinaryReader reader;
         StreamWriter writer;
-        bool isYellow = false;
-        bool isGreen = false;
 
         Util.ReaderHelper readerHelper = new Util.ReaderHelper();
         Util.WriteHelper writeHelper = new Util.WriteHelper();
-
-        PlayersChoiceSquirtle playersChoiceSquirtle = new PlayersChoiceSquirtle();
-        PlayersChoiceBulbasaur playersChoiceBulbasaur = new PlayersChoiceBulbasaur();
-        PlayersChoiceCharmander playersChoiceCharmander = new PlayersChoiceCharmander();
-        PokemonYellowOffsets pokemonYellowOffsets = new PokemonYellowOffsets();
-
+        Game game;
+        
+        ComboBox[] pokemonDropDowns;
+        TextBox[] textBoxes;
 
         public MainWindow()
         {
             InitializeComponent();
-            NameList.ItemsSource = pokemonData.getPokemonNames(); // handles your choice
-            NameList2.ItemsSource = pokemonData.getPokemonNames();
-            NameList3.ItemsSource = pokemonData.getPokemonNames();
 
-            NameList4.ItemsSource = pokemonData.getPokemonNames(); // handles rivals choice
-            NameList5.ItemsSource = pokemonData.getPokemonNames();
-            NameList6.ItemsSource = pokemonData.getPokemonNames();
+            pokemonDropDowns = new ComboBox[] {
+                playerChoice1, playerChoice2, playerChoice3, rivalChoice1, rivalChoice2, rivalChoice3,
+                BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6
+            };
 
-            BattleLocations.ItemsSource = pokemonData.getBattleLocations(); // gets battle locations
+            textBoxes = new TextBox[] {
+                LevelBox, LevelBox2, LevelBox3, 
+                BattleLvl, BattleLvl2, BattleLvl3, 
+                BattleLvl4, BattleLvl5, BattleLvl6, 
+                Pikachu_LevelBox
+            };
 
-            fileIdentfier = offsets.getFileIdentifier();
+            this.setupDropDowns(pokemonDropDowns);
+
+            BattleLocations.ItemsSource = Enum.GetValues(typeof(BattleName)); // gets battle locations
 
             pkmNames = pokemonData.getPokemonNames();
-            romName = offsets.getRomName();
-
-            BattlePokemon1.ItemsSource = pokemonData.getPokemonNames();
-            BattlePokemon2.ItemsSource = pokemonData.getPokemonNames();
-            BattlePokemon3.ItemsSource = pokemonData.getPokemonNames();
-            BattlePokemon4.ItemsSource = pokemonData.getPokemonNames();
-            BattlePokemon5.ItemsSource = pokemonData.getPokemonNames();
-            BattlePokemon6.ItemsSource = pokemonData.getPokemonNames();
         }
 
         private void menuOpen_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                openDialog.Filter = "PKM R/B (*.gb)|*.gb|PKM Y (*.gbc)|*.gbc";
-         
+                openDialog.Filter = "PKM R/B/G (*.gb)|*.gb|PKM Y (*.gbc)|*.gbc";
                 openDialog.ShowDialog();
                 reader = new BinaryReader(File.Open(openDialog.FileName, FileMode.Open, FileAccess.Read, FileShare.Write));
-
-                if (readerHelper.getRomVersion(reader, fileIdentfier).Equals("red"))
-                {
-                    setupForRed();
-                }
-                else if (readerHelper.getRomVersion(reader, fileIdentfier).Equals("blue"))
-                {
-                    setupForBlue();
-
-                } else if (readerHelper.getRomVersion(reader, fileIdentfier).Equals("yellow"))
-                {
-                    isYellow = true;
-                    setupForYellow();
-                }
-                else if (readerHelper.getRomVersion(reader, fileIdentfier).Equals("green"))
-                {
-                    isGreen = true;
-                    setupForGreen();
-                }
+                Version version = readerHelper.getRomVersion(reader, Game.FileIdentifierOffsets);
+                versionMap(version);
+                setup();
                 UiLoad();
             }
             catch (Exception args)
@@ -111,20 +84,26 @@ namespace StarterEdit
             }
         }
 
-
-        public void readStarterPokemon(long[] offsetArray, BinaryReader reader, Label Starter, ComboBox List, int starterNumber)
+        public void readStarterPokemon(Dictionary<Choice, long[]> offsetDictionary, BinaryReader reader, Label[] starters, ComboBox[] lists, int[] starterNumbers)
         {
-            int decVal = 0;
-            for (int i = 0; i < offsetArray.Length; i++)
+            for (int i = 0; i < starters.Length; i++)
             {
-                reader.BaseStream.Position = offsetArray[i];
-                string hexVal = string.Format("{0:X}", reader.ReadByte());
-                decVal = Convert.ToInt32(hexVal, 16);
+                Choice choice = (Choice)i;
+                long[] offsets = offsetDictionary[choice];
+
+                int decVal = 0;
+                foreach (long offset in offsets)
+                {
+                    reader.BaseStream.Position = offset;
+                    string hexVal = string.Format("{0:X}", reader.ReadByte());
+                    decVal = Convert.ToInt32(hexVal, 16);
+                }
+
+                starters[i].Content = pkmNames[decVal];
+                lists[i].SelectedIndex = decVal;
+                currentPokmon[starterNumbers[i]] = (byte)decVal;
+                setPlayerChoice();
             }
-            Starter.Content = pkmNames[decVal];
-            List.SelectedIndex = decVal;
-            currentPokmon[starterNumber] = (byte)decVal;
-            setPlayerChoice();
         }
 
         private void menuSave_Click(object sender, RoutedEventArgs e)
@@ -133,37 +112,28 @@ namespace StarterEdit
             {
                 writer = new StreamWriter(File.Open(openDialog.FileName, FileMode.Open, FileAccess.Write, FileShare.Read));
 
-                if (writeHelper.checkInputs(LevelBox, LevelBox2, LevelBox3, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6, Pikachu_LevelBox)) // If inputs aren't valid correct them
+                if (writeHelper.checkInputs(textBoxes)) // If inputs aren't valid correct them
                 {
-                    if (isYellow)
+                    if (loadedVersion.Equals(Version.Yellow))
                     {
-                        writeHelper.writeStarterPokemon(pokemonYellowOffsets.yellowFirstBattle, writer, NameList2.SelectedIndex, 1); // Writes the users first pokemon
-                        writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowFirstBattleUserLvl, writer, Pikachu_LevelBox); // writes the users first level
-                        writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowFirstBattleRivalLvl, writer, LevelBox2); // writes the rivals levels for the first battle
+                        writeHelper.writeStarterPokemon(catchingPikachuBattle[DataType.Pokemon], writer, playerChoice2.SelectedIndex, 1); // Writes the users first pokemon
+                        writeHelper.writeBattleLvls(catchingPikachuBattle[DataType.Level], writer, Pikachu_LevelBox); // writes the users first level
 
-                        writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowFirstBattleRival, writer, NameList5.SelectedIndex);
-
-                        canSaveYellow(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
-                            BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
+                        writeHelper.writeBattlePkm(firstRivalBattle[DataType.Pokemon], writer, rivalChoice2.SelectedIndex);
+                        writeHelper.writeBattleLvls(firstRivalBattle[DataType.Level], writer, LevelBox2); // writes the rivals levels for the first battle
+                        canSave(BattleLocations.SelectedIndex, this.getBattleSelectedIndex());
                     }
                     else
                     {
-                        writeHelper.writeStarterPokemon(sqrtlOffsets, writer, NameList.SelectedIndex, 0);
-                        writeHelper.writeStarterPokemon(bulbOffsets, writer, NameList2.SelectedIndex, 1);
-                        writeHelper.writeStarterPokemon(charmOffsets, writer, NameList3.SelectedIndex, 2);
+                        writeHelper.writeStarterPokemon(starterOffsets[Choice.Squirtle], writer, playerChoice1.SelectedIndex, 0);
+                        writeHelper.writeStarterPokemon(starterOffsets[Choice.Bulbasaur], writer, playerChoice2.SelectedIndex, 1);
+                        writeHelper.writeStarterPokemon(starterOffsets[Choice.Charmander], writer, playerChoice3.SelectedIndex, 2);
 
-                        writeHelper.writeBattleLvls(firstBattleLevels, writer, LevelBox, LevelBox2, LevelBox3); // writes the rivals levels for the first battle
-                        writeHelper.writeBattlePkm(firstBattlePokemon, writer, NameList4.SelectedIndex, NameList5.SelectedIndex, NameList6.SelectedIndex);
+                        writeHelper.writeBattleLvls(firstRivalBattle[DataType.Level], writer, getLevelBoxes()); // writes the rivals levels for the first battle
+                        writeHelper.writeBattlePkm(firstRivalBattle[DataType.Pokemon], writer, rivalChoice1.SelectedIndex, rivalChoice2.SelectedIndex, rivalChoice3.SelectedIndex);
                         writeHelper.writePatches(autoScrollLocation, writer, autoScroll);
 
-                        canSaveChoiceSquirtle(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
-                            BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
-
-                        canSaveChoiceBulbasaur(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
-                            BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
-
-                        canSaveChoiceCharmander(BattleLocations.SelectedIndex, BattlePokemon1.SelectedIndex, BattlePokemon2.SelectedIndex, BattlePokemon3.SelectedIndex,
-                            BattlePokemon4.SelectedIndex, BattlePokemon5.SelectedIndex, BattlePokemon6.SelectedIndex);
+                        canSave(BattleLocations.SelectedIndex, this.getBattleSelectedIndex());
                     }
                     MessageBox.Show("Changes saved succesfully", "Changes saved");
                 }
@@ -184,112 +154,82 @@ namespace StarterEdit
 
         }
 
-        public void setupForRed()
+        public void versionMap(Version version)
         {
-            bulbOffsets = offsets.getBulbasuarOffsets(); // load blue offsets
-            charmOffsets = offsets.getCharmanderOffsets();
-            sqrtlOffsets = offsets.getSquirtleOffsets();
+            Dictionary<Version, Func<Game>> versionMapping = new Dictionary<Version, Func<Game>>
+                {
+                    { Version.Red, () => new Red() },
+                    { Version.Blue, () => new Blue() },
+                    { Version.Green, () => new Green() },
+                    { Version.Yellow, () => new Yellow() }
+                };
 
-            firstBattleLevels = offsets.FirstBattleLevels;
-            firstBattlePokemon = offsets.FirstBattlePokemon;
-            rivalChoiceSquirtle = offsets.rivalsChoice1; // bulb
-            rivalChoiceBulbasaur = offsets.rivalsChoice2; // charmander
-            rivalChoiceCharmander = offsets.rivalsChoice3; // squirtle
-            autoScrollLocation = offsets.autoScroll;
-
-            playerChoice.IsEnabled = true;
-            playerChoice2.IsEnabled = true;
-            playerChoice3.IsEnabled = true;
-            playerChoice.IsChecked = true;
+            Func<Game> gameFactory = versionMapping[version];
+            game = gameFactory.Invoke();
         }
 
-        public void setupForBlue()
+        public void setup()
         {
-            bulbOffsets = offsets.getBlueBulbasaurOffsets(); // load blue offsets
-            charmOffsets = offsets.getBlueCharmanderOffsets();
-            sqrtlOffsets = offsets.getBlueSquirtleOffsets();
+            firstRivalBattle = game.GetFirstRivalBattle();
+            starterOffsets = game.GetStarterOffsets();
+            loadedVersion = game.GetVersion();
+            autoScrollLocation = game.GetAutoScroll();
+            rivalsChoice = game.GetRivalsChoice();
 
-            firstBattleLevels = offsets.FirstBattleLevels;
-            firstBattlePokemon = offsets.FirstBattlePokemon;
-            rivalChoiceSquirtle = offsets.rivalsChoice1 ; // bulb
-            rivalChoiceBulbasaur = offsets.rivalsChoice2; // charmander
-            rivalChoiceCharmander = offsets.rivalsChoice3; // squirtle
-            autoScrollLocation = offsets.autoScroll;
-
-            playerChoice.IsEnabled = true;
-            playerChoice2.IsEnabled = true;
-            playerChoice3.IsEnabled = true;
-            playerChoice.IsChecked = true;
-        }
-
-        public void setupForGreen()
-        {
-            bulbOffsets = offsets.greenBulbasuarOffsets;
-            charmOffsets = offsets.greenCharmanderOffsets;
-            sqrtlOffsets = offsets.greenSquirtleOffsets;
-
-            playersChoiceSquirtle.setOffsetsIfGreen(isGreen);
-            playersChoiceBulbasaur.setOffsetsIfGreen(isGreen);
-            playersChoiceCharmander.setOffsetsIfGreen(isGreen);
-
-            firstBattleLevels = offsets.greenFirstBattleLevels;
-            firstBattlePokemon = offsets.greenFirstBattlePokemon;
-            rivalChoiceSquirtle = offsets.greenRivalsChoice1; // bulb
-            rivalChoiceBulbasaur = offsets.greenRivalsChoice2; // charmander
-            rivalChoiceCharmander = offsets.greenRivalsChoice3; // squirtle
-            autoScrollLocation = offsets.greenAutoScroll;
-
-            playerChoice.IsEnabled = true;
-            playerChoice2.IsEnabled = true;
-            playerChoice3.IsEnabled = true;
-            playerChoice.IsChecked = true;
+            if (loadedVersion.Equals(Version.Yellow)) {
+                Yellow yellow = new Yellow();
+                catchingPikachuBattle = yellow.getCatchingPikachuBattle();
+                eveeBattles = yellow.getEveeBattles();
+            }
         }
 
         public void UiLoad()
         {
-            readStarterPokemon(sqrtlOffsets, reader, Starter1, NameList, 0);
-            readStarterPokemon(bulbOffsets, reader, Starter2, NameList2, 1);
-            readStarterPokemon(charmOffsets, reader, Starter3, NameList3, 2);
-
-            readStarterPokemon(rivalChoiceSquirtle, reader, RivalStarter, NameList4, 0);
-            readStarterPokemon(rivalChoiceBulbasaur, reader, RivalStarter2, NameList5, 1);
-            readStarterPokemon(rivalChoiceCharmander, reader, RivalStarter3, NameList6, 2);
-
-            playerChoice.IsEnabled = true;
-            playerChoice2.IsEnabled = true;
-            playerChoice3.IsEnabled = true;
-            playerChoice.IsChecked = true;
-
-            readerHelper.readBattleLvls(firstBattleLevels, reader, LevelBox, LevelBox2, LevelBox3);
-            autoScroll.IsChecked = readerHelper.readPatches(autoScrollLocation, reader);
-            StarterEditWindow.Title = "Starter Edit | " + readerHelper.getNameOfRomLoaded(reader, romName); // Sets rom name as title
-        }
-
-        public void setupForYellow()
-        {
-            if (isYellow)
-            {
+            if (loadedVersion.Equals(Version.Yellow)) {
                 playerChoice_Pikachu.IsChecked = true;
                 Pikachu_Label.Visibility = Visibility.Visible;
                 Pikachu_LevelBox.Visibility = Visibility.Visible;
-                readStarterPokemon(pokemonYellowOffsets.yellowFirstBattle, reader, Starter2, NameList2, 1);
-                readerHelper.readBattleLvls(pokemonYellowOffsets.yellowFirstBattleUserLvl, reader, Pikachu_LevelBox);
-                readStarterPokemon(pokemonYellowOffsets.yellowFirstBattleRival, reader, RivalStarter2, NameList5, 1);
-                readerHelper.readBattleLvls(pokemonYellowOffsets.yellowFirstBattleRivalLvl, reader, LevelBox2);
-
                 patches.Visibility = Visibility.Hidden;
-
                 playerChoice_Pikachu.Visibility = Visibility.Visible;
-         
-                NameList.IsEnabled = false;
-                NameList3.IsEnabled = false;
-                NameList4.IsEnabled = false;
-                NameList6.IsEnabled = false;
+                playerChoice1.IsEnabled = false;
+                playerChoice3.IsEnabled = false;
+                rivalChoice1.IsEnabled = false;
+                rivalChoice3.IsEnabled = false;
                 LevelBox.IsEnabled = false;
                 LevelBox3.IsEnabled = false;
-                StarterEditWindow.Title = "Starter Edit | " + readerHelper.getNameOfRomLoaded(reader, romName); // Sets rom name as title
                 hideRadioButtons();
+                readStarterPokemon(catchingPikachuBattle[DataType.Pokemon], reader, Starter2, playerChoice2, 1);
+                readerHelper.readBattleLvls(catchingPikachuBattle[DataType.Level], reader, [Pikachu_LevelBox]);
+                readStarterPokemon(firstRivalBattle[DataType.Pokemon], reader, RivalStarter2, rivalChoice2, 1);
+                readerHelper.readBattleLvls(catchingPikachuBattle[DataType.Level], reader, [LevelBox2]);
+
+            } else {
+
+                readStarterPokemon(starterOffsets, reader, [Starter1, Starter2, Starter3], [playerChoice1, playerChoice2, playerChoice3], [0, 1, 2]);
+                readStarterPokemon(rivalsChoice, reader, [RivalStarter, RivalStarter2, RivalStarter3], [rivalChoice1, rivalChoice2, rivalChoice3], [0, 1, 2]);
+                choiceSquirtle.IsEnabled = true;
+                choiceBulbasaur.IsEnabled = true;
+                choiceCharmander.IsEnabled = true;
+                choiceSquirtle.IsChecked = true;
+                readerHelper.readBattleLvls(firstRivalBattle[DataType.Level], reader, getLevelBoxes());
+                autoScroll.IsChecked = readerHelper.readPatches(autoScrollLocation, reader);
             }
+            StarterEditWindow.Title = "Starter Edit | " + readerHelper.getNameOfRomLoaded(reader, Game.RomName); // Sets rom name as title
+        }
+
+         public void readStarterPokemon(long[] offsetArray, BinaryReader reader, Label Starter, ComboBox List, int starterNumber)
+        {
+            int decVal = 0;
+            for (int i = 0; i < offsetArray.Length; i++)
+            {
+                reader.BaseStream.Position = offsetArray[i];
+                string hexVal = string.Format("{0:X}", reader.ReadByte());
+                decVal = Convert.ToInt32(hexVal, 16);
+            }
+            Starter.Content = pkmNames[decVal];
+            List.SelectedIndex = decVal;
+            currentPokmon[starterNumber] = (byte)decVal;
+            setPlayerChoice();
         }
         
         public bool isTextAllowed(string text) // checks to see if the input given is text
@@ -305,155 +245,52 @@ namespace StarterEdit
         private void setPlayerChoice()
         {
             // sets the radio buttons text to what the players choice of starter is
-            if (isYellow)
+            if (loadedVersion.Equals(Version.Yellow))
             {
                 playerChoice_Pikachu.Content = Starter2.Content.ToString();
             } else
             {
-                playerChoice.Content = Starter1.Content.ToString();
-                playerChoice2.Content = Starter2.Content.ToString();
-                playerChoice3.Content = Starter3.Content.ToString();
+                choiceSquirtle.Content = Starter1.Content.ToString();
+                choiceBulbasaur.Content = Starter2.Content.ToString();
+                choiceCharmander.Content = Starter3.Content.ToString();
             }
         }
 
         private void BattleLocations_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            int selectedIndex;
-            selectedIndex = BattleLocations.SelectedIndex;
-            switch (selectedIndex)
-            {
-                case 0: // route 22 battle 1
-                    BattleLvl3.IsEnabled = false;
-                    BattlePokemon3.IsEnabled = false;
-                    BattleLvl4.IsEnabled = false;
-                    BattlePokemon4.IsEnabled = false;
-                    BattleLvl5.IsEnabled = false;
-                    BattlePokemon5.IsEnabled = false;
-                    BattleLvl6.IsEnabled = false;
-                    BattlePokemon6.IsEnabled = false;
+            BattleName selectedBattle = (BattleName)BattleLocations.SelectedIndex;
 
-                    if (isYellow)
+            Dictionary<BattleName, bool[]> battleElementsStates = new Dictionary<BattleName, bool[]>()
+                {
+                    { BattleName.Route22_1, new bool[] { false, false, false, false } },
+                    { BattleName.CeruleanCity, new bool[] { true, true, false, false } },
+                    { BattleName.SSAnne, new bool[] { true, true, false, false } },
+                    { BattleName.PokemonTower, new bool[] { true, true, true, false } },
+                    { BattleName.SilphCo, new bool[] { true, true, true, false } },
+                    { BattleName.Route22_2, new bool[] { true, true, true, true } },
+                    { BattleName.IndigoPlateau, new bool[] { true, true, true, true } }
+                };
+
+            if (battleElementsStates.ContainsKey(selectedBattle)) {
+                enableBattleElements(battleElementsStates[selectedBattle]);
+
+                if (!loadedVersion.Equals(Version.Yellow)) {
+                    refershData(getCurrentChoice());
+                }
+
+                if (loadedVersion.Equals(Version.Yellow))
+                {
+                    if ((int)selectedBattle >= 3)
+                    {
+                        showCaseRadioButtons();
+                        refershData(getCurrentCase());
+                    }
+                    else if ((int)selectedBattle < 3)
                     {
                         hideCaseRadioButtons();
-                    }
-                    refershData(getCurrentChoice());
-                    break;
-
-                case 1: // cerulean city
-                    BattleLvl3.IsEnabled = true;
-                    BattlePokemon3.IsEnabled = true;
-                    BattleLvl4.IsEnabled = true;
-                    BattlePokemon4.IsEnabled = true;
-                    BattleLvl5.IsEnabled = false;
-                    BattlePokemon5.IsEnabled = false;
-                    BattleLvl6.IsEnabled = false;
-                    BattlePokemon6.IsEnabled = false;
-
-                    if (isYellow)
-                    {
-                        hideCaseRadioButtons();
-                    }
-                    refershData(getCurrentChoice());
-                    break;
-
-                case 2: // S.S Anne
-                    BattleLvl3.IsEnabled = true;
-                    BattlePokemon3.IsEnabled = true;
-                    BattleLvl4.IsEnabled = true;
-                    BattlePokemon4.IsEnabled = true;
-                    BattleLvl5.IsEnabled = false;
-                    BattlePokemon5.IsEnabled = false;
-                    BattleLvl6.IsEnabled = false;
-                    BattlePokemon6.IsEnabled = false;
-
-                    if (isYellow)
-                    {
-                        hideCaseRadioButtons();
-                    }
-                    refershData(getCurrentChoice());
-                    break;
-
-                case 3: // pokemon tower
-                    BattleLvl3.IsEnabled = true;
-                    BattlePokemon3.IsEnabled = true;
-                    BattleLvl4.IsEnabled = true;
-                    BattlePokemon4.IsEnabled = true;
-                    BattleLvl5.IsEnabled = true;
-                    BattlePokemon5.IsEnabled = true;
-                    BattleLvl6.IsEnabled = false;
-                    BattlePokemon6.IsEnabled = false;
-
-                    if (isYellow)
-                    {
-                        showCaseRadioButtons();
-                        refershData(getCurrentCase());
-                    } else
-                    {
                         refershData(getCurrentChoice());
                     }
-                    break;
-
-                case 4: // silph co
-                    BattleLvl3.IsEnabled = true;
-                    BattlePokemon3.IsEnabled = true;
-                    BattleLvl4.IsEnabled = true;
-                    BattlePokemon4.IsEnabled = true;
-                    BattleLvl5.IsEnabled = true;
-                    BattlePokemon5.IsEnabled = true;
-                    BattleLvl6.IsEnabled = false;
-                    BattlePokemon6.IsEnabled = false;
-
-                    if (isYellow)
-                    {
-                        showCaseRadioButtons();
-                        refershData(getCurrentCase());
-                    } else
-                    {
-                        refershData(getCurrentChoice());
-                    }
-                    break;
-
-                case 5: // route 22 battle 2
-                    BattleLvl3.IsEnabled = true;
-                    BattlePokemon3.IsEnabled = true;
-                    BattleLvl4.IsEnabled = true;
-                    BattlePokemon4.IsEnabled = true;
-                    BattleLvl5.IsEnabled = true;
-                    BattlePokemon5.IsEnabled = true;
-                    BattleLvl6.IsEnabled = true;
-                    BattlePokemon6.IsEnabled = true;
-
-                    if (isYellow)
-                    {
-                        showCaseRadioButtons();
-                        refershData(getCurrentCase());
-                    }
-                    else
-                    {
-                        refershData(getCurrentChoice());
-                    }
-                    break;
-
-                case 6: // indigo plateau
-                    BattleLvl3.IsEnabled = true;
-                    BattlePokemon3.IsEnabled = true;
-                    BattleLvl4.IsEnabled = true;
-                    BattlePokemon4.IsEnabled = true;
-                    BattleLvl5.IsEnabled = true;
-                    BattlePokemon5.IsEnabled = true;
-                    BattleLvl6.IsEnabled = true;
-                    BattlePokemon6.IsEnabled = true;
-
-                    if (isYellow)
-                    {
-                        showCaseRadioButtons();
-                        refershData(getCurrentCase());
-                    }
-                    else
-                    {
-                        refershData(getCurrentChoice());
-                    }
-                    break;
+                }
             }
         }
 
@@ -461,17 +298,17 @@ namespace StarterEdit
         {
             if (isSquirtleChecked())
             {
-                return playerChoice;
+                return choiceSquirtle;
             }
             if (isBulbasuarChecked())
             {
-                return playerChoice2;
+                return choiceBulbasaur;
             }
             if (isCharmanderChecked())
             {
-                return playerChoice3;
+                return choiceCharmander;
             }
-            if (isPikachuChecked() && isYellow)
+            if (isPikachuChecked() && loadedVersion.Equals(Version.Yellow))
             {
                 return playerChoice_Pikachu;
             }
@@ -480,7 +317,7 @@ namespace StarterEdit
 
         public RadioButton getCurrentCase()
         {
-            if (isYellow)
+            if (loadedVersion.Equals(Version.Yellow))
             {
                 if (isCase1Checked())
                 {
@@ -501,371 +338,116 @@ namespace StarterEdit
             return case_1;
         }
 
-        private void playerChoice_Checked(object sender, RoutedEventArgs e) // squirtle radio button
+        private void playerChoice_Checked(object sender, RoutedEventArgs e)
         {
             int battleSelected = BattleLocations.SelectedIndex;
 
-            if (isSquirtleChecked() && battleSelected == 0)
-            {
-                playerChoice2.SetCurrentValue(RadioButton.IsCheckedProperty, false);
-                playerChoice3.SetCurrentValue(RadioButton.IsCheckedProperty, false);
+            IPlayersChoice pokemonChoice = getPokemonChoice();
 
-                readerHelper.readBattleLvls(playersChoiceSquirtle.squirtleBattleRoute22Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceSquirtle.squirtleBattleRoute22Pkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
+            if (pokemonChoice != null)
+            {
+                BattleName selectedBattle = (BattleName)battleSelected;
+                Dictionary<DataType, long[]> battleData = pokemonChoice.getBattle(selectedBattle);
 
+                readerHelper.readBattleLvls(battleData[DataType.Level], reader, getBattleBoxes());
+                readerHelper.readBattlePokemon(battleData[DataType.Pokemon], reader, getPokemonBoxes());
             }
-            else if (isSquirtleChecked() && battleSelected == 1) // if another battle location is chosen, read from those offsets
-            {
-                readerHelper.readBattleLvls(playersChoiceSquirtle.squirtleBattleCeruleanCityLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceSquirtle.squirtleBattleCeruleanCityPkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (battleSelected == 2) // if another battle location is chosen, read from those offsets
-            {
-                readerHelper.readBattleLvls(playersChoiceSquirtle.squirtleBattleSSAnneLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceSquirtle.squirtleBattleSSAnnePkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (battleSelected == 3) // if another battle location is chosen, read from those offsets
-            {
-                readerHelper.readBattleLvls(playersChoiceSquirtle.squirtleBattlePokemonTowerLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceSquirtle.squirtleBattlePokemonTowerPkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (battleSelected == 4) // if another battle location is chosen, read from those offsets
-            {
-                readerHelper.readBattleLvls(playersChoiceSquirtle.squirtleBattleSilphCoLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceSquirtle.squirtleBattleSilphCoPkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (battleSelected == 5) // if another battle location is chosen, read from those offsets
-            {
-                readerHelper.readBattleLvls(playersChoiceSquirtle.squirtleBattleRoute22Lvl2, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceSquirtle.squirtleBattleRoute22Pkm2, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (battleSelected == 6) // if another battle location is chosen, read from those offsets
-            {
-                readerHelper.readBattleLvls(playersChoiceSquirtle.squirtleBattleIndigoPlateauLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceSquirtle.squirtleBattleIndigoPlateauPkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-        }
-
-        private void playerChoice2_Checked(object sender, RoutedEventArgs e) // bulbasaur radio button
-        {
-            int battleSelected = BattleLocations.SelectedIndex;
-
-            if (playerChoice2.IsChecked == true && battleSelected == 0)
-            {
-                playerChoice.SetCurrentValue(RadioButton.IsCheckedProperty, false);
-                playerChoice3.SetCurrentValue(RadioButton.IsCheckedProperty, false);
-
-                readerHelper.readBattleLvls(playersChoiceBulbasaur.bulbasaurBattleRoute22Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceBulbasaur.bulbasaurBattleRoute22Pkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (battleSelected == 1) // if another battle location is chosen, read from those offsets
-            {
-                readerHelper.readBattleLvls(playersChoiceBulbasaur.bulbasaurBattleCeruleanCityLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceBulbasaur.bulbasaurBattleCeruleanCityPkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (battleSelected == 2) // if another battle location is chosen, read from those offsets
-            {
-                readerHelper.readBattleLvls(playersChoiceBulbasaur.bulbasaurBattleSSAnneLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceBulbasaur.bulbasaurBattleSSAnnePkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (battleSelected == 3)
-            {
-                readerHelper.readBattleLvls(playersChoiceBulbasaur.bulbasaurBattlePokemonTowerLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceBulbasaur.bulbasaurBattlePokemonTowerPkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (battleSelected == 4) // if another battle location is chosen, read from those offsets
-            {
-                readerHelper.readBattleLvls(playersChoiceBulbasaur.bulbasaurBattleSilphCoLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceBulbasaur.bulbasaurBattleSilphCoPkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (battleSelected == 5) // if another battle location is chosen, read from those offsets
-            {
-                readerHelper.readBattleLvls(playersChoiceBulbasaur.bulbasaurBattleRoute22Lvl2, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceBulbasaur.bulbasaurBattleRoute22Pkm2, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (battleSelected == 6) // if another battle location is chosen, read from those offsets
-            {
-                readerHelper.readBattleLvls(playersChoiceBulbasaur.bulbasaurBattleIndigoPlateauLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceBulbasaur.bulbasaurBattleIndigoPlateauPkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-        }
-
-        private void playerChoice3_Checked(object sender, RoutedEventArgs e) // charmander radio button 
-        {
-            int battleSelected = BattleLocations.SelectedIndex;
-            if (playerChoice3.IsChecked == true && battleSelected == 0)
-            {
-                playerChoice2.SetCurrentValue(RadioButton.IsCheckedProperty, false);
-                playerChoice.SetCurrentValue(RadioButton.IsCheckedProperty, false);
-
-                readerHelper.readBattleLvls(playersChoiceCharmander.charmanderBattleRoute22Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceCharmander.charmanderBattleRoute22Pkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-                
-            }
-            else if (battleSelected == 1) // if another battle location is chosen, read from those offsets
-            {
-                readerHelper.readBattleLvls(playersChoiceCharmander.charmanderBattleCeruleanCityLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceCharmander.charmanderBattleCeruleanCityPkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            } 
-            else if (battleSelected == 2)
-            {
-                readerHelper.readBattleLvls(playersChoiceCharmander.charmanderBattleSSAnneLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceCharmander.charmanderBattleSSAnnePkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (battleSelected == 3)
-            {
-                readerHelper.readBattleLvls(playersChoiceCharmander.charmanderBattlePokemonTowerLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceCharmander.charmanderBattlePokemonTowerPkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (battleSelected == 4)
-            {
-                readerHelper.readBattleLvls(playersChoiceCharmander.charmanderBattleSilphCoLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceCharmander.charmanderBattleSilphCoPkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (battleSelected == 5)
-            {
-                readerHelper.readBattleLvls(playersChoiceCharmander.charmanderBattleRoute22Lvl2, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceCharmander.charmanderBattleRoute22Pkm2, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (battleSelected == 6)
-            {
-                readerHelper.readBattleLvls(playersChoiceCharmander.charmanderBattleIndigoPlateauLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(playersChoiceCharmander.charmanderBattleIndigoPlateauPkm, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-
         }
 
         private void playerChoice_Checked_Pikachu(object sender, RoutedEventArgs e) // pikachu
         {
-            int battleSelected = BattleLocations.SelectedIndex; 
+            int battleSelected = BattleLocations.SelectedIndex;
 
-            if (isPikachuChecked() && battleSelected == 0 && isYellow)
+            IPlayersChoice pokemonChoice = getPokemonChoice();
+
+            if (battleSelected < 3 && isPikachuChecked())
             {
-                readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleRoute22PKM, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (isPikachuChecked() && battleSelected == 1 && isYellow)
-            {
-                readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleCeruleanCityLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleCeruleanCityPKM, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-            }
-            else if (isPikachuChecked() && battleSelected == 2 && isYellow)
-            {
-                readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleSSAnneLvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleSSAnnePKM, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
+                BattleName selectedBattle = (BattleName)battleSelected;
+                Dictionary<DataType, long[]> battleData = eveeBattles[selectedBattle];
+
+                readerHelper.readBattleLvls(battleData[DataType.Level], reader, getBattleBoxes());
+                readerHelper.readBattlePokemon(battleData[DataType.Pokemon], reader, getPokemonBoxes());
             }
         }
 
-        public void canSaveChoiceSquirtle(int battleSelected, int pkm1, int pkm2, int pkm3, int pkm4, int pkm5, int pkm6)
+        public void canSave(int battleSelected, int[] pokemonArray)
         {
-            if (isSquirtleChecked() && battleSelected == 0) // route 22
-            {
-                writeHelper.writeBattlePkm(playersChoiceSquirtle.squirtleBattleRoute22Pkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceSquirtle.squirtleBattleRoute22Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isSquirtleChecked() && battleSelected == 1)  // cerulean city
-            {
-                writeHelper.writeBattlePkm(playersChoiceSquirtle.squirtleBattleCeruleanCityPkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceSquirtle.squirtleBattleCeruleanCityLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isSquirtleChecked() && battleSelected == 2) // SS Anne
-            {
-                writeHelper.writeBattlePkm(playersChoiceSquirtle.squirtleBattleSSAnnePkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceSquirtle.squirtleBattleSSAnneLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isSquirtleChecked() && battleSelected == 3) // pokemon tower
-            {
-                writeHelper.writeBattlePkm(playersChoiceSquirtle.squirtleBattlePokemonTowerPkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceSquirtle.squirtleBattlePokemonTowerLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isSquirtleChecked() && battleSelected == 4) // silph co
-            {
-                writeHelper.writeBattlePkm(playersChoiceSquirtle.squirtleBattleSilphCoPkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceSquirtle.squirtleBattleSilphCoLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isSquirtleChecked() && battleSelected == 5) // route 22, 2nd battle
-            {
-                writeHelper.writeBattlePkm(playersChoiceSquirtle.squirtleBattleRoute22Pkm2, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceSquirtle.squirtleBattleRoute22Lvl2, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isSquirtleChecked() && battleSelected == 6) // indigo plateau
-            {
-                writeHelper.writeBattlePkm(playersChoiceSquirtle.squirtleBattleIndigoPlateauPkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceSquirtle.squirtleBattleIndigoPlateauLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-        }
+            IPlayersChoice pokemonChoice = getPokemonChoice();
 
-        public void canSaveChoiceBulbasaur(int battleSelected, int pkm1, int pkm2, int pkm3, int pkm4, int pkm5, int pkm6)
-        {
-            if (isBulbasuarChecked() && battleSelected == 0) // route 22
+            if (pokemonChoice != null)
             {
-                writeHelper.writeBattlePkm(playersChoiceBulbasaur.bulbasaurBattleRoute22Pkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceBulbasaur.bulbasaurBattleRoute22Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isBulbasuarChecked() && battleSelected == 1)  // cerulean city
-            {
-                writeHelper.writeBattlePkm(playersChoiceBulbasaur.bulbasaurBattleCeruleanCityPkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceBulbasaur.bulbasaurBattleCeruleanCityLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isBulbasuarChecked() && battleSelected == 2) // SS Anne
-            {
-                writeHelper.writeBattlePkm(playersChoiceBulbasaur.bulbasaurBattleSSAnnePkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceBulbasaur.bulbasaurBattleSSAnneLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isBulbasuarChecked() && battleSelected == 3) // pokemon tower
-            {
-                writeHelper.writeBattlePkm(playersChoiceBulbasaur.bulbasaurBattlePokemonTowerPkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceBulbasaur.bulbasaurBattlePokemonTowerLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isBulbasuarChecked() && battleSelected == 4) // silph co
-            {
-                writeHelper.writeBattlePkm(playersChoiceBulbasaur.bulbasaurBattleSilphCoPkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceBulbasaur.bulbasaurBattleSilphCoLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isBulbasuarChecked() && battleSelected == 5) // route 22, 2nd battle
-            {
-                writeHelper.writeBattlePkm(playersChoiceBulbasaur.bulbasaurBattleRoute22Pkm2, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceBulbasaur.bulbasaurBattleRoute22Lvl2, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isBulbasuarChecked() && battleSelected == 6) // indigo plateau
-            {
-                writeHelper.writeBattlePkm(playersChoiceBulbasaur.bulbasaurBattleIndigoPlateauPkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceBulbasaur.bulbasaurBattleIndigoPlateauLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-        }
+                BattleName selectedBattle = (BattleName)battleSelected;
+                Dictionary<DataType, long[]> battleData = pokemonChoice.getBattle(selectedBattle);
 
-        public void canSaveChoiceCharmander(int battleSelected, int pkm1, int pkm2, int pkm3, int pkm4, int pkm5, int pkm6)
-        {
-            if (isCharmanderChecked() && battleSelected == 0) // route 22
-            {
-                writeHelper.writeBattlePkm(playersChoiceCharmander.charmanderBattleRoute22Pkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceCharmander.charmanderBattleRoute22Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
+                writeHelper.writeBattleLvls(battleData[DataType.Level], writer, getBattleBoxes());
+                writeHelper.writeBattlePkm(battleData[DataType.Pokemon], writer, pokemonArray);
             }
-            else if (isCharmanderChecked() && battleSelected == 1)  // cerulean city
-            {
-                writeHelper.writeBattlePkm(playersChoiceCharmander.charmanderBattleCeruleanCityPkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceCharmander.charmanderBattleCeruleanCityLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isCharmanderChecked() && battleSelected == 2) // SS Anne
-            {
-                writeHelper.writeBattlePkm(playersChoiceCharmander.charmanderBattleSSAnnePkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceCharmander.charmanderBattleSSAnneLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isCharmanderChecked() && battleSelected == 3) // pokemon tower
-            {
-                writeHelper.writeBattlePkm(playersChoiceCharmander.charmanderBattlePokemonTowerPkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceCharmander.charmanderBattlePokemonTowerLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isCharmanderChecked() && battleSelected == 4) // silph co
-            {
-                writeHelper.writeBattlePkm(playersChoiceCharmander.charmanderBattleSilphCoPkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceCharmander.charmanderBattleSilphCoLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isCharmanderChecked() && battleSelected == 5) // route 22, 2nd battle
-            {
-                writeHelper.writeBattlePkm(playersChoiceCharmander.charmanderBattleRoute22Pkm2, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceCharmander.charmanderBattleRoute22Lvl2, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-            else if (isCharmanderChecked() && battleSelected == 6) // indigo plateau
-            {
-                writeHelper.writeBattlePkm(playersChoiceCharmander.charmanderBattleIndigoPlateauPkm, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(playersChoiceCharmander.charmanderBattleIndigoPlateauLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            }
-        }
 
-        public void canSaveYellow(int battleSelected, int pkm1, int pkm2, int pkm3, int pkm4, int pkm5, int pkm6)
-        {
-            //pkm1 - pkm6 is the choice index selected
-            if (isPikachuChecked() && battleSelected == 0) // route 22
+            if (pokemonChoice == null)
             {
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleRoute22PKM, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-            } 
-            else if (isPikachuChecked() && battleSelected == 1) // cerulean city
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleCeruleanCityLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleCeruleanCityPKM, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-            }
-            else if (isPikachuChecked() && battleSelected == 2) // SS Anne
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleSSAnneLvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleSSAnnePKM, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-            }
-            else if (isPikachuChecked() && battleSelected == 3 && isCase1Checked()) // Pokemon tower Case 1
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC1Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC1PKM, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 3 && isCase2Checked()) // Pokemon tower Case 2
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC2Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC2PKM, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 3 && isCase3Checked()) // Pokemon tower Case 3
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC3Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC3PKM, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 4 && isCase1Checked()) // Silph Co. Case 1
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleSilphCoC1Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleSilphCoC1PKM, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 4 && isCase2Checked()) // Silph Co. Case 2
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleSilphCoC2Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleSilphCoC2PKM, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 4 && isCase3Checked()) // Silph Co. Case 3
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleSilphCoC3Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleSilphCoC3PKM, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 5 && isCase1Checked()) // Route 22 (2) case 1
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22C1Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleRoute22C1PKM, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 5 && isCase2Checked()) // Route 22 (2) case 2
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22C2Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleRoute22C2PKM, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 5 && isCase3Checked()) // Route 22 (2) case 3
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22C3Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleRoute22C3PKM, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 6 && isCase1Checked()) // Indigo Plateau case 1
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC1Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC1PKM, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 6 && isCase2Checked()) // Indigo Plateau case 2
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC2Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC2PKM, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
-            }
-            else if (isPikachuChecked() && BattleLocations.SelectedIndex == 6 && isCase3Checked()) // Indigo Plateau case 3
-            {
-                writeHelper.writeBattleLvls(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC3Lvl, writer, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                writeHelper.writeBattlePkm(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC3PKM, writer, pkm1, pkm2, pkm3, pkm4, pkm5, pkm6);
+                BattleName selectedBattle = (BattleName)battleSelected;
+                Dictionary<DataType, long[]> battleData = eveeBattles[selectedBattle];
+
+                writeHelper.writeBattleLvls(battleData[DataType.Level], writer, getBattleBoxes());
+                writeHelper.writeBattlePkm(battleData[DataType.Pokemon], writer, pokemonArray);
             }
         }
 
         public Boolean isSquirtleChecked()
         {
-            return (bool)playerChoice.IsChecked;
+            return (bool)choiceSquirtle.IsChecked;
+        }
+
+        public IPlayersChoice getPokemonChoice()
+        {
+            if (isSquirtleChecked()) {
+                resetRadioButtons(choiceBulbasaur, choiceCharmander);
+                return game.GetPlayersChoice(Choice.Squirtle);
+            }
+
+            if (isBulbasuarChecked()) {
+                resetRadioButtons(choiceSquirtle, choiceCharmander);
+                return game.GetPlayersChoice(Choice.Bulbasaur);
+            }
+
+            if (isCharmanderChecked()) {
+                resetRadioButtons(choiceSquirtle, choiceBulbasaur);
+                return game.GetPlayersChoice(Choice.Charmander);
+            }
+
+            if (isCase1Checked()) {
+                resetRadioButtons(case_2, case_3);
+                return game.GetPlayersChoice(Choice.Jolteon);
+            }
+
+            if (isCase2Checked()) {
+                resetRadioButtons(case_1, case_3);
+                return game.GetPlayersChoice(Choice.Flareon);
+            }
+
+            if (isCase3Checked()) {
+                 resetRadioButtons(case_1, case_2);
+                return game.GetPlayersChoice(Choice.Vaporeon);
+            }
+
+            return null;
+        }
+
+
+        public void resetRadioButtons(RadioButton choice1, RadioButton choice2)
+        {
+            choice1.SetCurrentValue(RadioButton.IsCheckedProperty, false);
+            choice2.SetCurrentValue(RadioButton.IsCheckedProperty, false);
         }
 
         public Boolean isBulbasuarChecked()
         {
-            return (bool)playerChoice2.IsChecked;
+            return (bool)choiceBulbasaur.IsChecked;
         }
 
         public Boolean isCharmanderChecked()
         {
-            return (bool)playerChoice3.IsChecked;
+            return (bool)choiceCharmander.IsChecked;
         }
 
         public Boolean isCase1Checked()
@@ -890,9 +472,9 @@ namespace StarterEdit
 
         public void hideRadioButtons()
         {
-            playerChoice.Visibility = Visibility.Hidden;
-            playerChoice2.Visibility = Visibility.Hidden;
-            playerChoice3.Visibility = Visibility.Hidden;
+            choiceSquirtle.Visibility = Visibility.Hidden;
+            choiceBulbasaur.Visibility = Visibility.Hidden;
+            choiceCharmander.Visibility = Visibility.Hidden;
         }
 
         public void showCaseRadioButtons()
@@ -915,104 +497,72 @@ namespace StarterEdit
             case_3.IsEnabled = false;
         }
 
+        public void enableBattleElements(bool[] bools)
+        {
+            BattleLvl3.IsEnabled = false;
+            BattleLvl4.IsEnabled = false;
+            BattleLvl5.IsEnabled = false;
+            BattleLvl6.IsEnabled = false;
+
+            BattlePokemon3.IsEnabled = false;
+            BattlePokemon4.IsEnabled = false;
+            BattlePokemon5.IsEnabled = false;
+            BattlePokemon6.IsEnabled = false;
+
+            TextBox[] battleLvls = new TextBox[] { BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6 };
+            ComboBox[] battlePokemon = new ComboBox[] { BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6 };
+
+            for (int i = 0; i < bools.Length; i++) {
+                battleLvls[i].IsEnabled = bools[i];
+                battlePokemon[i].IsEnabled = bools[i];
+
+                if (!battleLvls[i].IsEnabled) {
+                    battleLvls[i].Text = "0";
+                }
+            }
+        }
+
         public void refershData(RadioButton currentChoice)
         {
-            if (currentChoice == null)
-            {
-                return;
-            } 
-            else
+            if (currentChoice != null)
             {
                 currentChoice.IsChecked = false;
                 currentChoice.IsChecked = true;
             }
         }
 
-        private void case_1_Checked(object sender, RoutedEventArgs e)
+        public ComboBox[] getPokemonBoxes()
         {
-            if (isYellow)
-            {
-                int battleSelected = BattleLocations.SelectedIndex;
+            return new ComboBox[] { BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6 };
+        }
 
-                if (battleSelected == 3)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC1Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC1PKM, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-                }
-                else if (battleSelected == 4)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleSilphCoC1Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleSilphCoC1PKM, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-                }
-                else if (battleSelected == 5)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22C1Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleRoute22C1PKM, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-                }
-                else if (battleSelected == 6)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC1Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC1PKM, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-                }
+        public TextBox[] getBattleBoxes()
+        {
+            return [BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6];
+        }
+
+        public TextBox[] getLevelBoxes()
+        {
+            return [LevelBox, LevelBox2, LevelBox3];
+        }
+
+        private void setupDropDowns(ComboBox[] dropDowns)
+        {
+            foreach (ComboBox comboBox in dropDowns) {
+                comboBox.ItemsSource = pokemonData.getPokemonNames();
             }
         }
 
-        private void case_2_Checked(object sender, RoutedEventArgs e)
+        private int[] getBattleSelectedIndex()
         {
-            if (isYellow)
-            {
-                int battleSelected = BattleLocations.SelectedIndex;
-
-                if (battleSelected == 3)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC2Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC2PKM, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-                }
-                else if (battleSelected == 4)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleSilphCoC2Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleSilphCoC2PKM, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-                }
-                else if (battleSelected == 5)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22C2Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleRoute22C2PKM, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-                }
-                else if (battleSelected == 6)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC2Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC2PKM, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-                }
-            }
-        }
-
-        private void case_3_Checked(object sender, RoutedEventArgs e)
-        {
-            if (isYellow)
-            {
-                int battleSelected = BattleLocations.SelectedIndex;
-
-                if (battleSelected == 3)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC3Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattlePokemonTowerC3PKM, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-                } 
-                else if (battleSelected == 4)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleSilphCoC3Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleSilphCoC3PKM, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-                }
-                else if (battleSelected == 5)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleRoute22C3Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleRoute22C3PKM, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-                }
-                else if (battleSelected == 6)
-                {
-                    readerHelper.readBattleLvls(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC3Lvl, reader, BattleLvl, BattleLvl2, BattleLvl3, BattleLvl4, BattleLvl5, BattleLvl6);
-                    readerHelper.readBattlePokemon(pokemonYellowOffsets.yellowRivalBattleIndigoPlateauC3PKM, reader, BattlePokemon1, BattlePokemon2, BattlePokemon3, BattlePokemon4, BattlePokemon5, BattlePokemon6);
-                }
-            }
+            return [ 
+                    BattlePokemon1.SelectedIndex,
+                    BattlePokemon2.SelectedIndex, 
+                    BattlePokemon3.SelectedIndex,     
+                    BattlePokemon4.SelectedIndex,
+                    BattlePokemon5.SelectedIndex,
+                    BattlePokemon6.SelectedIndex
+                ];
         }
 
         private void menuHelp_Click(object sender, RoutedEventArgs e)
@@ -1043,7 +593,5 @@ namespace StarterEdit
                 }
             }
         }
-
     }
-
 }
