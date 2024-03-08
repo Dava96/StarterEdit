@@ -25,4 +25,4 @@ Allows you to individually edit the 24 battle encouters you have with the rival 
 ## Requirements
 Pokemon Red/Blue/Green/Yellow rom file.
 
-[Requires .Netcore 3.1](https://dotnet.microsoft.com/download/dotnet-core/3.1)
+[Requires .Net 8.0 ](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
