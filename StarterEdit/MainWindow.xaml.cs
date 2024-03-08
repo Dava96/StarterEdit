@@ -192,7 +192,6 @@ namespace StarterEdit
                 patches.Visibility = Visibility.Hidden;
                 playerChoice_Pikachu.Visibility = Visibility.Visible;
                 playerChoice1.IsEnabled = false;
-                playerChoice1.Visibility = Visibility.Hidden;
                 playerChoice3.IsEnabled = false;
                 rivalChoice1.IsEnabled = false;
                 rivalChoice3.IsEnabled = false;
@@ -200,10 +199,9 @@ namespace StarterEdit
                 LevelBox3.IsEnabled = false;
                 hideRadioButtons();
                 readStarterPokemon(catchingPikachuBattle[DataType.Pokemon], reader, Starter2, playerChoice2, 1);
-                readerHelper.readBattleLvls(catchingPikachuBattle[DataType.Level], reader, Pikachu_LevelBox);
+                readerHelper.readBattleLvls(catchingPikachuBattle[DataType.Level], reader, [Pikachu_LevelBox]);
                 readStarterPokemon(firstRivalBattle[DataType.Pokemon], reader, RivalStarter2, rivalChoice2, 1);
-                readerHelper.readBattleLvls(catchingPikachuBattle[DataType.Level], reader, LevelBox2);
-
+                readerHelper.readBattleLvls(catchingPikachuBattle[DataType.Level], reader, [LevelBox2]);
 
             } else {
 

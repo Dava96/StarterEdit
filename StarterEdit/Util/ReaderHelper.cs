@@ -8,10 +8,17 @@ namespace StarterEdit.Util
 {
     class ReaderHelper
     {
+        private string redIdentfier;
+        private string blueIdentfier;
+        private string yellowIdentfier;
+        private string greenIdentfier;
 
         public ReaderHelper()
         {
-
+            this.yellowIdentfier = "9747C";
+            this.greenIdentfier = "9CDDD5";
+            this.redIdentfier ="2091E6";
+            this.blueIdentfier = "D39DA";
         }
 
         public string getNameOfRomLoaded(BinaryReader reader, long[] romName)
@@ -33,10 +40,6 @@ namespace StarterEdit.Util
         public Version getRomVersion(BinaryReader reader, long[] fileIdentifer)
         {
             String hexVal = "";
-            String blueIdentfier = "D39DA";
-            String redIdentfier = "2091E6";
-            String yellowIdentfier = "9747C";
-            String greenIdentfier = "9CDDD5";
 
             for (int i = 0; i < fileIdentifer.Length; i++)
             {
@@ -44,14 +47,14 @@ namespace StarterEdit.Util
                hexVal += string.Format("{0:X}", reader.ReadByte());
             }
 
-            if (hexVal.Equals(redIdentfier))
+            if (hexVal.Equals(this.redIdentfier))
             {
                 return Version.Red;
             } 
-            else if (hexVal.Equals(blueIdentfier))
+            else if (hexVal.Equals(this.blueIdentfier))
             {
                 return Version.Blue;
-            } else if (hexVal.Equals(yellowIdentfier))
+            } else if (hexVal.Equals(this.yellowIdentfier))
             {
                 return Version.Yellow;
             } else
@@ -72,22 +75,6 @@ namespace StarterEdit.Util
                     pokemonLevel = Convert.ToInt32(hexVal, 16);
                     battleBoxes[i].Text = pokemonLevel.ToString();
                 }
-            }
-        }
-
-        public void readBattleLvls(long[] offsetArray, BinaryReader reader, TextBox levelBox)
-        {
-
-            // This deals with the first battle for pokemon yellow as there is only one pokemon at the start
-
-            TextBox[] levelBoxes = new TextBox[] { levelBox };
-            int pokemonLevel = 0;
-            for (int i = 0; i < offsetArray.Length; i++)
-            {
-                reader.BaseStream.Position = offsetArray[i];
-                string hexVal = string.Format("{0:X}", reader.ReadByte());
-                pokemonLevel = Convert.ToInt32(hexVal, 16);
-                levelBoxes[i].Text = pokemonLevel.ToString();
             }
         }
 
